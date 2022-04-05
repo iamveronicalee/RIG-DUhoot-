@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from "react"
+import axios from "axios";
+import React, {useEffect, useRef, useState} from "react"
 
 
 export default function Login() {
@@ -9,6 +10,13 @@ export default function Login() {
   * Copyright 2017-2018 Software Laboratory Center, BINUS University
   */
   "use strict";
+
+
+  const [userName, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+
+  const usernameRef = useRef()
+  const passwordRef = useRef()
 
   function Vector(x, y) {
       this.x = x, this.y = y
@@ -115,6 +123,24 @@ export default function Login() {
       }
   };
 
+  function handleLogin(e){
+    e.preventDefault();
+
+    const data = {
+      username : usernameRef.current.value,
+      password : passwordRef.current.value
+    }    
+
+    axios.post('http://localhost:9000/login', data )
+    .then((response)=>{
+        console.log(response.data.User)
+    }).catch((error) =>{
+      console.log(error)
+    })
+    
+    
+  }
+
   useEffect(() => {
     let canvas = document.getElementById("particle-canvas")
     canvas.width = window.innerWidth
@@ -130,10 +156,8 @@ export default function Login() {
     particleCanvas.draw()
   }, []);
 
-
-
     return (
-      <div className="min-h-screen bg-blue-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex flex-col justify-center bg-blue-900 py-12 sm:px-6 lg:px-8">
         <canvas className="fixed z-0 w-max"  id="particle-canvas"height={'726'}></canvas>
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white pb-8 px-4 shadow sm:rounded-lg sm:px-10">
@@ -142,7 +166,7 @@ export default function Login() {
                 <img className="h-20 pt-2 mt-2" src="https://bluejack.binus.ac.id/prk/assets/binus.png"></img>
             </div>
 
-            <form className="space-y-6 relative" action="#" method="POST">
+            <form className="space-y-6 relative" onSubmit={handleLogin}>
               <div>
                 <label htmlFor="text" className="block text-sm font-medium text-gray-700">
                   NIM
@@ -152,6 +176,7 @@ export default function Login() {
                     id="text"
                     name="text"
                     type="text"
+                    ref={usernameRef}
                     autoComplete="text"
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -169,6 +194,7 @@ export default function Login() {
                     name="password"
                     type="password"
                     autoComplete="current-password"
+                    ref={passwordRef}
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
