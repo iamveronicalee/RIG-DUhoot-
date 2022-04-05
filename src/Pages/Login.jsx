@@ -1,19 +1,19 @@
 import axios from "axios";
 import React, {useEffect, useRef, useState} from "react"
-
+import ReactSession from 'react-client-session';
+import Homepage from "./Homepage";
 
 export default function Login() {
 
 
-    /*!
+  /*!
   * Particle Canvas
   * Copyright 2017-2018 Software Laboratory Center, BINUS University
   */
   "use strict";
 
 
-  const [userName, setUsername] = useState("")
-  const [password, setPassword] = useState("")
+  const [username, setUsername] = useState()
 
   const usernameRef = useRef()
   const passwordRef = useRef()
@@ -133,7 +133,26 @@ export default function Login() {
 
     axios.post('http://localhost:9000/login', data )
     .then((response)=>{
-        console.log(response.data.User)
+        if (response.data.User == undefined){
+          // usernya ga ketemu
+          console.log('user not found')
+        }
+        else{
+          // user ketemu
+          console.log(response.data.User)
+          ReactSession.setStoreType("localStorage");
+          let obj = response.data.User;
+          let email = obj.Emails[0] 
+          let name = obj.Name;
+          let role = obj.Role;
+          let nim = obj.UserName;
+          let userId = obj.UserId 
+          ReactSession.set("email", email);
+          ReactSession.set("name", name);
+          ReactSession.set("role", role);
+          ReactSession.set("nim", nim);
+          ReactSession.set("userId", userId);
+        }
     }).catch((error) =>{
       console.log(error)
     })
@@ -154,6 +173,7 @@ export default function Login() {
     let particleCanvas = new ParticleCanvas(canvas, mousePosition)
     particleCanvas.init()
     particleCanvas.draw()
+
   }, []);
 
     return (
