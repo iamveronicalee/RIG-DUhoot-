@@ -1,12 +1,16 @@
-import { useState } from 'react'
-import './App.css'
-import Login from './Pages/Login'
+import { useState } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import "./App.css";
+import Login from "./Pages/Login";
 
 function App() {
-
   return (
-    <Login/>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route exact path="/login" element={<Login />}></Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
