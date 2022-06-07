@@ -1,15 +1,5 @@
 import React from "react";
 
-export default function Homepage(){
-
-
-
-
-    
-
-    return (
-        <div>
-
-        </div>
-    )
+export default function HomePage() {
+  return <div></div>;
 }
