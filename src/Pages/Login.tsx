@@ -2,22 +2,28 @@ import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import StellarBackground from "../Component/StellarBackground";
 import { EncryptToBase64 } from "../Code/Encrypt";
-import { useSessionStorage } from '../Utils/useSessionStorage';
+import { useSessionStorage, getSessionStorageOrDefault } from "../Utils/useSessionStorage";
+import { useParams } from "react-router";
+import {useNavigate} from "react-router-dom"
 import { XCircleIcon, XIcon } from "@heroicons/react/solid";
 
 export default function Login() {
   const usernameRef = useRef(null);
   const passwordRef = useRef(null);
+  const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
-  const [user, setUser] = useSessionStorage('userId', "");
-  const [binusian, setBinusian] = useSessionStorage('binusianId', "");
-
+  const [user, setUser] = useSessionStorage("userId", "");
+  const [userSession, setUserSesison] = useState(getSessionStorageOrDefault("userId", "") ?? "")
+  const [binusian, setBinusian] = useSessionStorage("binusianId", "");
 
   useEffect(() => {
     if (errorMessage == "") {
       document.getElementById("error-cont").style.display = "none";
     }
-  });
+    if(userSession !== "") {
+      navigate('/')
+    }
+  }, []);
 
   function fetchLecturer() {
     const lectData = {
@@ -35,11 +41,15 @@ export default function Login() {
         if (data == undefined) {
           setErrorMessage("Authentication Failed!");
           document.getElementById("error-cont").style.display = "block";
-        } else { // lecturer found
+        } else {
+          // lecturer found
           console.log(data);
           let obj = response.data.User;
+          let userId = obj.UserId;
           let binusianId = obj.BinusianId;
-          setBinusian(binusianId)
+          setUser(userId);
+          setBinusian(binusianId);
+          navigate('/')
         }
       })
       .catch((error) => {
@@ -57,14 +67,18 @@ export default function Login() {
     axios
       .post("http://localhost:9000/login", data)
       .then((response) => {
-        let data = response.data.User 
+        let data = response.data.User;
         if (data == undefined) {
           fetchLecturer();
-        } else { // student found
+        } else {
+          // student found
           console.log(response.data.User);
           let obj = response.data.User;
           let userId = obj.UserId;
-          setUser(userId)
+          let binusianId = obj.BinusianId;
+          setUser(userId);
+          setBinusian(binusianId);
+          navigate('/')
         }
       })
       .catch((error) => {
