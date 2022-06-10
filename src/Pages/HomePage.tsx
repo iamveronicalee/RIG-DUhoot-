@@ -7,7 +7,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if(userSession === "") {
-      navigate('/login')
+      navigate('/auth/login')
     }
   }, []);
   
