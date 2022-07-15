@@ -87,6 +87,12 @@ export default function Layout(props, { children }) {
       setNewQuizModalOpen(true);
       setSidebarOpen(false);
     }
+    else if (name == "My Quiz"){
+
+    }
+    else if (name == "Quiz History"){
+      
+    }
   };
 
   const createNewQuiz = () => {
@@ -101,6 +107,19 @@ export default function Layout(props, { children }) {
       },
     });
   };
+
+
+  const myQuiz = ()=>{
+    navigate("/my-quiz")
+  }
+
+  const quizHistory = () =>{
+    navigate("/quiz-history")
+  }
+
+  const signOut = () =>{
+
+  }
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
