@@ -72,6 +72,7 @@ export default function Layout(props, { children }) {
   const [newQuizName, setNewQuizName] = useState("");
   const [createQuiz, createQuizRes] = useMutation(CREATE_QUIZ);
   const [user, setUser] = useState("");
+  const [username, setUsername] = useState("")
   
   const navigate = useNavigate();
 
@@ -109,6 +110,8 @@ export default function Layout(props, { children }) {
         },
       })
       .then((response) => {
+        // console.log(response.data)
+        setUsername(response.data.realname)
         setUser(response.data.username);
       });
   };
@@ -252,7 +255,7 @@ export default function Layout(props, { children }) {
                     </div>
                     <div className="ml-3">
                       <p className="text-base font-medium text-white">
-                        Tom Cook
+                        {username}
                       </p>
                     </div>
                   </div>
@@ -406,7 +409,7 @@ export default function Layout(props, { children }) {
                     />
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-white">Tom Cook</p>
+                    <p className="text-sm font-medium text-white">{username}</p>
                   </div>
                 </div>
               </a>

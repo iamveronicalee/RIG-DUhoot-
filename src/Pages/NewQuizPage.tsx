@@ -414,7 +414,7 @@ export default function NewQuizPage(){
                         <div className="flex content-center mt-6 w-full h-full mx-auto px-4 sm:px-6 md:px-8">
                         {/* Replace with your content */}
                         
-                            <div className="flex flex-col content-center sm:justify-center pt-4 overflow-y-scroll overflow-x-hidden rounded-lg shadow-xl bg-indigo-600 h-5/6 w-full sm:pt-2 sm:pt-10">
+                        <div className="flex flex-col content-center sm:justify-center pt-4 overflow-y-scroll overflow-x-hidden rounded-lg shadow-xl bg-indigo-600 h-5/6 w-full sm:pt-2 sm:pt-10">
                                 <div className="px-4 pt-5 sm:px-6 flex-col sm:flex sm:flex-row justify-between content-center">
                                     <div>
                                         <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">Answer</h3>
@@ -481,7 +481,6 @@ export default function NewQuizPage(){
                                 </div>
 
                                 <div className="px-4 pb-6 sm:py-6 sm:px-6 h-2/5">
-
                                     <div className= "h-full">
                                         <label htmlFor="question" className=" text-2xl font-extrabold text-white">
                                             Question:

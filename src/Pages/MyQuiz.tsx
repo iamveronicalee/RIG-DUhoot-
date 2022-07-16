@@ -21,6 +21,7 @@ mutation GetPersonQuizList($userId: Float!) {
       updatedAt
       creatorId
       isStart
+      isFinished
     }
   }
 `;
@@ -95,13 +96,13 @@ export default function MyQuiz(){
             // console.log(userQuizRes.data.getPersonQuizList)
             for (let i = 0; i<userQuizRes.data.getPersonQuizList.length; i++){
                 let quizName = userQuizRes.data.getPersonQuizList[i].quizName;
-                console.log(quizName + " " + quizName.length)
+                // console.log(quizName + " " + quizName.length)
                 if (quizName.length >= 10){
                     quizName = quizName.substring(0,10);
                     quizName += "...";
                 }  
 
-                let isStart = userQuizRes.data.getPersonQuizList[i].isStart;
+                let isFinished = userQuizRes.data.getPersonQuizList[i].isFinished;
                 // console.log(isStart)
                 let nav = {
                     name : quizName,
@@ -110,7 +111,7 @@ export default function MyQuiz(){
                     quizId : userQuizRes.data.getPersonQuizList[i].id
                 }
 
-                if (isStart == true){
+                if (isFinished == false){
                     setNavigation(navigation => [...navigation, nav]);
                 }
                 else {
@@ -238,6 +239,28 @@ export default function MyQuiz(){
                             ))}
                         </nav>
                         </div>
+
+                        <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto bg-indigo-700">
+                            <h1 className="text-center text-white font-bold text-xl">
+                                Ongoing Quiz
+                            </h1>
+                        <nav className="mt-5 flex-1 justify-center px-2 space-y-1 text-center bg-indigo-800">
+                            {navigation.map((item) => (
+                            <a
+                                key={item.name}
+                                href={item.href}
+                                className = "flex justify-center"
+                            >
+                                <button
+                                type="button"
+                                className="flex items-center px-5 py-3 m-2 my-4 border border-transparent text-base font-medium rounded shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 w-full ">
+                                {item.name}
+                                </button>
+                            </a>
+                            ))}
+                        </nav>
+                        </div>
+
                         <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto bg-indigo-700">
                             <h1 className="text-center text-white font-bold text-xl">
                                 Finished Quiz
