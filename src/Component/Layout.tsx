@@ -12,12 +12,12 @@ import {
 } from "@heroicons/react/outline";
 import { gql } from "apollo-boost";
 import { useMutation } from "@apollo/react-hooks";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
+import { useNavigate } from "react-router-dom";
 
-const navigation = [
-  { name: "Join a Quiz", href: "#", icon: LinkIcon, current: true },
+const nav = [
+  { name: "Join a Quiz", href: "./", icon: LinkIcon, current: true },
   { name: "Create New Quiz", href: "#", icon: FolderAddIcon, current: false },
   { name: "My Quiz", href: "#", icon: CollectionIcon, current: false },
   { name: "Quiz History", href: "#", icon: ClockIcon, current: false },
@@ -31,19 +31,21 @@ function classNames(...classes) {
 const CREATE_QUIZ = gql`
   mutation createQuiz($data: CreateQuizInput!) {
     createQuiz(data: $data) {
+      id,
       quizName
     }
   }
 `;
 
-export default function Layout(props, { children }) {
+export default function Layout(props, { children}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [newQuizModalOpen, setNewQuizModalOpen] = useState(false);
   const [newQuizName, setNewQuizName] = useState("");
   const [createQuiz, createQuizRes] = useMutation(CREATE_QUIZ);
   const [user, setUser] = useState("");
-
+  
   const navigate = useNavigate();
+
   const createNewQuizButtonRef = useRef();
 
   useEffect(() => {
@@ -56,9 +58,9 @@ export default function Layout(props, { children }) {
   }, []);
 
   useEffect(() => {
-    for (let i = 0; i < navigation.length; i++) {
-      if (navigation[i].name == props.page) {
-        navigation[i].current = true;
+    for (let i = 0; i < nav.length; i++) {
+      if (nav[i].name == props.page) {
+        nav[i].current = true;
         break;
       }
     }
@@ -67,6 +69,7 @@ export default function Layout(props, { children }) {
   useEffect(() => {
     if (createQuizRes.data) {
       console.log(createQuizRes.data);
+      navigate("/create-quiz", {state : createQuizRes.data})
     }
   }, [createQuizRes.data]);
 
@@ -153,11 +156,11 @@ export default function Layout(props, { children }) {
                 </div>
               </Transition.Child>
               <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
-                <div className="flex-shrink-0 flex items-center px-4">
-                  <img className="h-8 w-auto" src="" alt="Workflow" />
+                <div className="flex-shrink-0 flex items-center px-4 font-duhoot font-black text-5xl text-white italic">
+                  DUhoot!
                 </div>
                 <nav className="mt-5 px-2 space-y-1">
-                  {navigation.map((item) => {
+                  {nav.map((item) => {
                     let handleClick = () => {
                       clickMenu(item.name);
                     };
@@ -308,11 +311,11 @@ export default function Layout(props, { children }) {
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-col h-0 flex-1">
             <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-              <div className="flex items-center flex-shrink-0 px-4">
-                <img className="h-8 w-auto" src="" alt="Workflow" />
+              <div className="flex items-center flex-shrink-0 px-4 font-duhoot font-black text-5xl text-white italic">
+                DUhoot!
               </div>
               <nav className="mt-5 flex-1 px-2 space-y-1">
-                {navigation.map((item) => {
+                {nav.map((item) => {
                   let handleClick = () => {
                     clickMenu(item.name);
                   };

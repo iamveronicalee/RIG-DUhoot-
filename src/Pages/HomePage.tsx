@@ -9,10 +9,10 @@ export default function HomePage() {
         <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
           <div className="max-w-7xl mx-auto ">
             {/* Replace with your content */}
-            <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen flex items-center justify-center bg-indigo-900 py-12 px-4 sm:px-6 lg:px-8">
               <div className="max-w-md w-full space-y-8">
                 <div>
-                  <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                  <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
                     Join Quiz
                   </h2>
                 </div>

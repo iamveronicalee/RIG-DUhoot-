@@ -56,6 +56,7 @@ export default function LoginPage() {
       .post("http://localhost:9000/auth/login", data)
       .then((response) => {
         let data = response.data;
+        console.log(data)
         if (data.accessToken == undefined) {
           fetchLecturer();
         } else {

@@ -40,3 +40,20 @@
 button {
   font-size: calc(10px + 2vmin);
 }
+
+/* Demonstrate a "mostly customized" scrollbar
+ * (won't be visible otherwise if width/height is specified) */
+.mostly-customized-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 8px;
+  background-color: #aaa; /* or add it to the track */
+}
+
+/* Add a thumb */
+.mostly-customized-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(51, 17, 241);
+}
+
+/* ::-webkit-input-placeholder {
+  text-align: center;
+}*/
