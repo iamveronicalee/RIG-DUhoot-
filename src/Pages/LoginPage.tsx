@@ -25,7 +25,7 @@ export default function LoginPage() {
   function fetchLecturer() {
     const lectData = {
       username: username.toLowerCase(),
-      password: EncryptToBase64(username.toLowerCase(), password),
+      password: EncryptToBase64(username.toLowerCase(), password), 
     };
 
     axios

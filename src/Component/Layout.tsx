@@ -16,14 +16,6 @@ import axios from "axios";
 import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
 import { useNavigate } from "react-router-dom";
 
-const nav = [
-  { name: "Join a Quiz", href: "./", icon: LinkIcon, current: true },
-  { name: "Create New Quiz", href: "#", icon: FolderAddIcon, current: false },
-  { name: "My Quiz", href: "#", icon: CollectionIcon, current: false },
-  { name: "Quiz History", href: "#", icon: ClockIcon, current: false },
-  { name: "Sign Out", href: "#", icon: LogoutIcon, current: false },
-];
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -37,7 +29,44 @@ const CREATE_QUIZ = gql`
   }
 `;
 
-export default function Layout(props, { children}) {
+const navigation = [
+  { name: "Join a Quiz", href: "#", icon: LinkIcon, current: true},
+  { name: "Create New Quiz", href: "#", icon: FolderAddIcon, current: false },
+  { name: "My Quiz", href: "#", icon: CollectionIcon, current: false },
+  { name: "Quiz History", href: "#", icon: ClockIcon, current: false },
+  { name: "Sign Out", href: "#", icon: LogoutIcon, current: false },
+];
+
+const path = window.location.href;
+var pathName = "";
+
+if (path == "http://localhost:3000/quiz-history#" || path == "http://localhost:3000/quiz-history"){
+  pathName = "Quiz History";
+}
+else if (path == "http://localhost:3000/my-quiz#" || path == "http://localhost:3000/my-quiz"){
+  pathName = "My Quiz"
+}
+else if (path == "http://localhost:3000/#" || path == "http://localhost:3000/"){
+  pathName = "Join a Quiz"
+}
+else if (path == "http://localhost:3000/create-quiz#" || path == "http://localhost:3000/create-quiz"){
+  pathName = "Create New Quiz"
+}
+
+const refreshCurrent = (pageName)=>{
+  for (let i = 0; i < navigation.length; i++) {
+    if (navigation[i].name == pageName) {
+      navigation[i].current = true;
+    }
+    else{
+      navigation[i].current = false;
+    }
+  }
+}
+
+refreshCurrent(pathName)
+
+export default function Layout(props, { children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [newQuizModalOpen, setNewQuizModalOpen] = useState(false);
   const [newQuizName, setNewQuizName] = useState("");
@@ -48,6 +77,12 @@ export default function Layout(props, { children}) {
 
   const createNewQuizButtonRef = useRef();
 
+
+  useEffect(()=>{
+   refreshCurrent(props.page)
+  },[])
+
+
   useEffect(() => {
     const token = getSessionStorageOrDefault("accessToken", "");
     if (token == "") {
@@ -57,16 +92,9 @@ export default function Layout(props, { children}) {
     }
   }, []);
 
-  useEffect(() => {
-    for (let i = 0; i < nav.length; i++) {
-      if (nav[i].name == props.page) {
-        nav[i].current = true;
-        break;
-      }
-    }
-  }, []);
 
   useEffect(() => {
+
     if (createQuizRes.data) {
       console.log(createQuizRes.data);
       navigate("/create-quiz", {state : createQuizRes.data})
@@ -90,6 +118,18 @@ export default function Layout(props, { children}) {
       setNewQuizModalOpen(true);
       setSidebarOpen(false);
     }
+    else if (name == "Join a Quiz"){
+      navigate("/")
+    }
+    else if (name == "My Quiz"){
+      myQuiz();
+    }
+    else if (name == "Quiz History"){
+      quizHistory();
+    }
+    else if (name == "Sign Out"){
+      signOut();
+    }
   };
 
   const createNewQuiz = () => {
@@ -104,6 +144,20 @@ export default function Layout(props, { children}) {
       },
     });
   };
+
+
+  const myQuiz = ()=>{
+    // console.log("Tes")
+    navigate("/my-quiz")
+  }
+
+  const quizHistory = () =>{
+    navigate("/quiz-history")
+  }
+
+  const signOut = () =>{
+
+  }
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
@@ -160,7 +214,7 @@ export default function Layout(props, { children}) {
                   DUhoot!
                 </div>
                 <nav className="mt-5 px-2 space-y-1">
-                  {nav.map((item) => {
+                  {navigation.map((item) => {
                     let handleClick = () => {
                       clickMenu(item.name);
                     };
@@ -315,7 +369,7 @@ export default function Layout(props, { children}) {
                 DUhoot!
               </div>
               <nav className="mt-5 flex-1 px-2 space-y-1">
-                {nav.map((item) => {
+                {navigation.map((item) => {
                   let handleClick = () => {
                     clickMenu(item.name);
                   };
