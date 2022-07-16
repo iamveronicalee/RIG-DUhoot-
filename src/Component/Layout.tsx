@@ -23,14 +23,14 @@ function classNames(...classes) {
 const CREATE_QUIZ = gql`
   mutation createQuiz($data: CreateQuizInput!) {
     createQuiz(data: $data) {
-      id,
+      id
       quizName
     }
   }
 `;
 
 const navigation = [
-  { name: "Join a Quiz", href: "#", icon: LinkIcon, current: true},
+  { name: "Join a Quiz", href: "#", icon: LinkIcon, current: true },
   { name: "Create New Quiz", href: "#", icon: FolderAddIcon, current: false },
   { name: "My Quiz", href: "", icon: CollectionIcon, current: false },
   { name: "Quiz History", href: "#", icon: ClockIcon, current: false },
@@ -40,31 +40,39 @@ const navigation = [
 const path = window.location.href;
 var pathName = "";
 
-if (path == "http://localhost:3000/quiz-history#" || path == "http://localhost:3000/quiz-history"){
+if (
+  path == "http://localhost:3000/quiz-history#" ||
+  path == "http://localhost:3000/quiz-history"
+) {
   pathName = "Quiz History";
-}
-else if (path == "http://localhost:3000/my-quiz#" || path == "http://localhost:3000/my-quiz"){
-  pathName = "My Quiz"
-}
-else if (path == "http://localhost:3000/#" || path == "http://localhost:3000/"){
-  pathName = "Join a Quiz"
-}
-else if (path == "http://localhost:3000/create-quiz#" || path == "http://localhost:3000/create-quiz"){
-  pathName = "Create New Quiz"
+} else if (
+  path == "http://localhost:3000/my-quiz#" ||
+  path == "http://localhost:3000/my-quiz"
+) {
+  pathName = "My Quiz";
+} else if (
+  path == "http://localhost:3000/#" ||
+  path == "http://localhost:3000/"
+) {
+  pathName = "Join a Quiz";
+} else if (
+  path == "http://localhost:3000/create-quiz#" ||
+  path == "http://localhost:3000/create-quiz"
+) {
+  pathName = "Create New Quiz";
 }
 
-const refreshCurrent = (pageName)=>{
+const refreshCurrent = (pageName) => {
   for (let i = 0; i < navigation.length; i++) {
     if (navigation[i].name == pageName) {
       navigation[i].current = true;
-    }
-    else{
+    } else {
       navigation[i].current = false;
     }
   }
-}
+};
 
-refreshCurrent(pathName)
+refreshCurrent(pathName);
 
 export default function Layout(props, { children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -72,18 +80,15 @@ export default function Layout(props, { children }) {
   const [newQuizName, setNewQuizName] = useState("");
   const [createQuiz, createQuizRes] = useMutation(CREATE_QUIZ);
   const [disableCreateQuiz, setDisableCreateQuiz] = useState(true);
-
   const [user, setUser] = useState("");
-  
-  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
 
+  const navigate = useNavigate();
   const createNewQuizButtonRef = useRef();
 
-
-  useEffect(()=>{
-   refreshCurrent(props.page)
-  },[])
-
+  useEffect(() => {
+    refreshCurrent(props.page);
+  }, []);
 
   useEffect(() => {
     const token = getSessionStorageOrDefault("accessToken", "");
@@ -94,11 +99,9 @@ export default function Layout(props, { children }) {
     }
   }, []);
 
-
   useEffect(() => {
-
     if (createQuizRes.data) {
-      navigate("/create-quiz", {state : createQuizRes.data})
+      navigate("/create-quiz", { state: createQuizRes.data });
     }
   }, [createQuizRes.data]);
 
@@ -110,6 +113,9 @@ export default function Layout(props, { children }) {
         },
       })
       .then((response) => {
+        // console.log(response.data)
+        // console.log(response.data.realname)
+        setUsername(response.data.realname);
         setUser(response.data.username);
       });
   };
@@ -118,17 +124,13 @@ export default function Layout(props, { children }) {
     if (name == "Create New Quiz") {
       setNewQuizModalOpen(true);
       setSidebarOpen(false);
-    }
-    else if (name == "Join a Quiz"){
-      navigate("/")
-    }
-    else if (name == "My Quiz"){
+    } else if (name == "Join a Quiz") {
+      navigate("/");
+    } else if (name == "My Quiz") {
       myQuiz();
-    }
-    else if (name == "Quiz History"){
+    } else if (name == "Quiz History") {
       quizHistory();
-    }
-    else if (name == "Sign Out"){
+    } else if (name == "Sign Out") {
       signOut();
     }
   };
@@ -146,19 +148,15 @@ export default function Layout(props, { children }) {
     });
   };
 
+  const myQuiz = () => {
+    navigate("/my-quiz");
+  };
 
-  const myQuiz = ()=>{
-    // console.log("Tes")
-    navigate("/my-quiz")
-  }
+  const quizHistory = () => {
+    navigate("/quiz-history");
+  };
 
-  const quizHistory = () =>{
-    navigate("/quiz-history")
-  }
-
-  const signOut = () =>{
-
-  }
+  const signOut = () => {};
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
@@ -179,7 +177,7 @@ export default function Layout(props, { children }) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-gray-600 bg-opacity-75" />
+            <Dialog.Overlay className="fixed inset-0 bg-indigo-800 bg-opacity-75" />
           </Transition.Child>
           <Transition.Child
             as={Fragment}
@@ -217,7 +215,12 @@ export default function Layout(props, { children }) {
                 <nav className="mt-5 px-2 space-y-1">
                   {navigation.map((item) => {
                     let handleClick = () => {
-                      if(item.name == "Create New Quiz" && pathName == "Create New Quiz"){return}
+                      if (
+                        item.name == "Create New Quiz" &&
+                        pathName == "Create New Quiz"
+                      ) {
+                        return;
+                      }
                       clickMenu(item.name);
                     };
                     return (
@@ -254,7 +257,7 @@ export default function Layout(props, { children }) {
                     </div>
                     <div className="ml-3">
                       <p className="text-base font-medium text-white">
-                        {user ? user : ""}
+                        {username}
                       </p>
                     </div>
                   </div>
@@ -408,7 +411,7 @@ export default function Layout(props, { children }) {
                     />
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-white">{user ? user : ""}</p>
+                    <p className="text-sm font-medium text-white">{username}</p>
                   </div>
                 </div>
               </a>
@@ -417,13 +420,18 @@ export default function Layout(props, { children }) {
         </div>
       </div>
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
-        <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3">
+        <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-indigo-800">
           <button
             className="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
-            <MenuIcon className="h-6 w-6" aria-hidden="true" />
+            <MenuIcon
+              className="h-6 w-6"
+              aria-hidden="true"
+              fill="white"
+              stroke="white"
+            />
           </button>
         </div>
         {/* Page Content */}

@@ -2,10 +2,15 @@ import { useMutation } from "@apollo/react-hooks";
 import { Transition, Dialog } from "@headlessui/react";
 import {
   XIcon,
+  MenuAlt2Icon,
+  SearchIcon,
+  BellIcon,
+  LinkIcon,
   MenuIcon,
   PlusIcon,
   TrashIcon,
   SaveIcon,
+  QrcodeIcon,
 } from "@heroicons/react/outline";
 import { gql } from "apollo-boost";
 import React, { Fragment, useEffect, useState } from "react";
@@ -94,11 +99,19 @@ export default function NewQuizPage() {
   const [answerD, setAnswerD] = useState("");
   const [selectedAnswer, setSelectedAnswer] = useState("");
 
+  function isActive(id) {
+    if (id == currentQuestion) {
+      return "flex content-center justify-center w-3/4 py-5 my-3 border border-transparent text-2xl font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-md outline-none ring-2 ring-offset-2 ring-indigo-500";
+    }
+    return "flex content-center justify-center w-3/4 py-5 my-3 border border-transparent text-2xl font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-md";
+  }
+
   useEffect(() => {
     if (getQuizDataRes.data) {
       const quizDatas = getQuizDataRes.data.getAllQuizDetailById;
       console.log(getQuizDataRes.data);
       // masukin data kedalam array of quizData
+      setOptions([newOpt1]);
       quizDatas.map((item) => {
         const i = item.question;
         //nanti kita tinggal buat quizData baru append ke options
@@ -394,6 +407,7 @@ export default function NewQuizPage() {
                             updateUI(item);
                           }}
                           className="flex content-center justify-center w-3/4 py-5 my-3 border border-transparent text-2xl font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md"
+                          className={isActive(options.indexOf(item))}
                         >
                           {options.indexOf(item) + 1}
                         </button>
@@ -423,6 +437,7 @@ export default function NewQuizPage() {
                           updateUI(item);
                         }}
                         className="flex content-center justify-center w-3/4 py-5 my-3 border border-transparent text-2xl font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md"
+                        className={isActive(options.indexOf(item))}
                       >
                         {options.indexOf(item) + 1}
                       </button>
