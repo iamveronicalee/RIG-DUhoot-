@@ -16,14 +16,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
 
-const navigation = [
-  { name: "Join a Quiz", href: "#", icon: LinkIcon, current: true },
-  { name: "Create New Quiz", href: "#", icon: FolderAddIcon, current: false },
-  { name: "My Quiz", href: "#", icon: CollectionIcon, current: false },
-  { name: "Quiz History", href: "#", icon: ClockIcon, current: false },
-  { name: "Sign Out", href: "#", icon: LogoutIcon, current: false },
-];
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -36,6 +28,43 @@ const CREATE_QUIZ = gql`
   }
 `;
 
+const navigation = [
+  { name: "Join a Quiz", href: "#", icon: LinkIcon, current: true},
+  { name: "Create New Quiz", href: "#", icon: FolderAddIcon, current: false },
+  { name: "My Quiz", href: "#", icon: CollectionIcon, current: false },
+  { name: "Quiz History", href: "#", icon: ClockIcon, current: false },
+  { name: "Sign Out", href: "#", icon: LogoutIcon, current: false },
+];
+
+const path = window.location.href;
+var pathName = "";
+
+if (path == "http://localhost:3000/quiz-history#" || path == "http://localhost:3000/quiz-history"){
+  pathName = "Quiz History";
+}
+else if (path == "http://localhost:3000/my-quiz#" || path == "http://localhost:3000/my-quiz"){
+  pathName = "My Quiz"
+}
+else if (path == "http://localhost:3000/#" || path == "http://localhost:3000/"){
+  pathName = "Join a Quiz"
+}
+else if (path == "http://localhost:3000/create-quiz#" || path == "http://localhost:3000/create-quiz"){
+  pathName = "Create New Quiz"
+}
+
+const refreshCurrent = (pageName)=>{
+  for (let i = 0; i < navigation.length; i++) {
+    if (navigation[i].name == pageName) {
+      navigation[i].current = true;
+    }
+    else{
+      navigation[i].current = false;
+    }
+  }
+}
+
+refreshCurrent(pathName)
+
 export default function Layout(props, { children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [newQuizModalOpen, setNewQuizModalOpen] = useState(false);
@@ -46,21 +75,18 @@ export default function Layout(props, { children }) {
   const navigate = useNavigate();
   const createNewQuizButtonRef = useRef();
 
+
+  useEffect(()=>{
+   refreshCurrent(props.page)
+  },[])
+
+
   useEffect(() => {
     const token = getSessionStorageOrDefault("accessToken", "");
     if (token == "") {
       navigate("/auth/login");
     } else {
       fetchUser(token);
-    }
-  }, []);
-
-  useEffect(() => {
-    for (let i = 0; i < navigation.length; i++) {
-      if (navigation[i].name == props.page) {
-        navigation[i].current = true;
-        break;
-      }
     }
   }, []);
 
@@ -87,11 +113,17 @@ export default function Layout(props, { children }) {
       setNewQuizModalOpen(true);
       setSidebarOpen(false);
     }
+    else if (name == "Join a Quiz"){
+      navigate("/")
+    }
     else if (name == "My Quiz"){
-
+      myQuiz();
     }
     else if (name == "Quiz History"){
-      
+      quizHistory();
+    }
+    else if (name == "Sign Out"){
+      signOut();
     }
   };
 
@@ -110,6 +142,7 @@ export default function Layout(props, { children }) {
 
 
   const myQuiz = ()=>{
+    // console.log("Tes")
     navigate("/my-quiz")
   }
 
