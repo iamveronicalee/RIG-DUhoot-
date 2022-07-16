@@ -32,7 +32,7 @@ const CREATE_QUIZ = gql`
 const navigation = [
   { name: "Join a Quiz", href: "#", icon: LinkIcon, current: true},
   { name: "Create New Quiz", href: "#", icon: FolderAddIcon, current: false },
-  { name: "My Quiz", href: "#", icon: CollectionIcon, current: false },
+  { name: "My Quiz", href: "", icon: CollectionIcon, current: false },
   { name: "Quiz History", href: "#", icon: ClockIcon, current: false },
   { name: "Sign Out", href: "#", icon: LogoutIcon, current: false },
 ];
@@ -71,6 +71,8 @@ export default function Layout(props, { children }) {
   const [newQuizModalOpen, setNewQuizModalOpen] = useState(false);
   const [newQuizName, setNewQuizName] = useState("");
   const [createQuiz, createQuizRes] = useMutation(CREATE_QUIZ);
+  const [disableCreateQuiz, setDisableCreateQuiz] = useState(true);
+
   const [user, setUser] = useState("");
   const [username, setUsername] = useState("")
   
@@ -97,7 +99,6 @@ export default function Layout(props, { children }) {
   useEffect(() => {
 
     if (createQuizRes.data) {
-      console.log(createQuizRes.data);
       navigate("/create-quiz", {state : createQuizRes.data})
     }
   }, [createQuizRes.data]);
@@ -181,7 +182,7 @@ export default function Layout(props, { children }) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-gray-600 bg-opacity-75" />
+            <Dialog.Overlay className="fixed inset-0 bg-indigo-800 bg-opacity-75" />
           </Transition.Child>
           <Transition.Child
             as={Fragment}
@@ -219,12 +220,13 @@ export default function Layout(props, { children }) {
                 <nav className="mt-5 px-2 space-y-1">
                   {navigation.map((item) => {
                     let handleClick = () => {
+                      if(item.name == "Create New Quiz" && pathName == "Create New Quiz"){return}
                       clickMenu(item.name);
                     };
                     return (
                       <a
                         key={item.name}
-                        href={item.href}
+                        // href={item.href}
                         className={classNames(
                           item.current
                             ? "bg-blue-800 text-white"
@@ -379,7 +381,7 @@ export default function Layout(props, { children }) {
                   return (
                     <a
                       key={item.name}
-                      href={item.href}
+                      // href={item.href}
                       className={classNames(
                         item.current
                           ? "bg-blue-800 text-white"
@@ -418,13 +420,13 @@ export default function Layout(props, { children }) {
         </div>
       </div>
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
-        <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3">
+        <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-indigo-800">
           <button
             className="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
-            <MenuIcon className="h-6 w-6" aria-hidden="true" />
+            <MenuIcon className="h-6 w-6" aria-hidden="true" fill="white" stroke="white"/>
           </button>
         </div>
         {/* Page Content */}

@@ -56,11 +56,11 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
 }
 
-export default function NewQuizPage(){
+export default function QuizComponent({quizId, quizName}){
 
     // Data yang di pass
-    const { state } = useLocation();
-    const {createQuiz} = state;
+
+
     
     const [createQuizDetail, createQuizDetailRes] = useMutation(CREATE_QUIZ_DETAIL)
     const [deleteQuizQuestion, deleteQuizQuestionRes] = useMutation(DELETE_QUIZ_QUESTION)
@@ -117,7 +117,7 @@ export default function NewQuizPage(){
     const reloadData = () => {
         getQuizData({
             variables: {
-                quizId: createQuiz.id
+                quizId: quizId
             }
         });
     }
@@ -133,7 +133,8 @@ export default function NewQuizPage(){
     useEffect(() => {
 
         if(deleteQuizQuestionRes.data){
-            window.location.reload()
+            setOptions([newOpt1])
+            reloadData()
         }
 
     }, [deleteQuizQuestionRes.data])
@@ -141,7 +142,9 @@ export default function NewQuizPage(){
     useEffect(() => {
         if(updateQuizDetailRes.data){
             //disini palingan keluarin something like update success
-            window.location.reload()
+            // window.location.reload()
+            setOptions([newOpt1])
+            reloadData()
         }
     }, [updateQuizDetailRes.data])
 
@@ -332,7 +335,7 @@ export default function NewQuizPage(){
         createQuizDetail({
             variables: {
                 createQuizDetailData: createQuizDetailData,
-                quizId: createQuiz.id
+                quizId: quizId
             },
         });
 
@@ -343,9 +346,12 @@ export default function NewQuizPage(){
         setSelectedAnswer(str)
     }
 
+    useEffect(()=>{
+        setOptions([newOpt1])
+        reloadData()
+    }, [quizId])
+
     return (
-        <>
-            <Layout key="" page={"Create New Quiz"}>
             <div className="h-screen flex overflow-hidden bg-indigo-900">
                 <Transition.Root show={sidebarOpen} as={Fragment}>
                     <Dialog
@@ -442,13 +448,14 @@ export default function NewQuizPage(){
                     </div>
                 </div>
                 <div className="flex flex-col w-0 flex-1 overflow-hidden">
-                    <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3">
+                    <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-indigo-800">
                     <button
-                        className="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                        className="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-white hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 w-full bg-indigo-600"
                         onClick={() => setSidebarOpen(true)}
                     >
                         <span className="sr-only">Open sidebar</span>
-                        <MenuIcon className="h-6 w-6" aria-hidden="true" />
+                        {/* <MenuIcon className="h-6 w-6" aria-hidden="true" /> */}
+                        <h1 className="w-full">Select a Question</h1>
                     </button>
                     </div>
                     <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
@@ -458,7 +465,7 @@ export default function NewQuizPage(){
 
                             className="inline-flex items-center justify-center px-2.5 py-3 content-center border border-transparent text-5xl font-medium rounded shadow-sm font-extrabold text-white italic bg-indigo-600 w-full h-full drop-shadow-md lg:text-5xl md:text-5xl text-2xl"
                         >
-                            {createQuiz.quizName} Quiz
+                            {quizName} Quiz
                         </h1>
                         </div>
                         <div className="flex content-center mt-6 w-full h-full mx-auto px-4 sm:px-6 md:px-8">
@@ -615,9 +622,6 @@ export default function NewQuizPage(){
                     </div>
                     </main>
                 </div>
-                </div>
-
-            </Layout>
-        </>
+            </div>
     )
 }
