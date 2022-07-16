@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/react-hooks";
 import { Transition, Dialog, Menu } from "@headlessui/react";
-import { XIcon, MenuAlt2Icon, SearchIcon, BellIcon, LinkIcon, MenuIcon, PlusIcon, TrashIcon, SaveIcon } from "@heroicons/react/outline";
+import { XIcon, MenuAlt2Icon, SearchIcon, BellIcon, LinkIcon, MenuIcon, PlusIcon, TrashIcon, SaveIcon, QrcodeIcon } from "@heroicons/react/outline";
 import { gql } from "apollo-boost";
 import { create } from "domain";
 import React, { Fragment, useEffect, useState } from "react";
@@ -14,29 +14,43 @@ const CREATE_QUIZ_DETAIL = gql`
         createQuizDetail(data: $createQuizDetailData, quizId: $quizId) {
             quizId,
             questionId
+            question {
+                optionConnection {
+                    id,
+                    optionDescription,
+                    isAnswer
+                }
+            }
         }
     }
 `;
 
-// const GET_QUIZ_DATA = gql`
-//     mutation GetQuizDetailsById($quizId: Float!) {
-//         getAllQuizDetailById(quizId: $quizId) {
-//             question {
-//             questionDescription
-//             } 
-//             questionOptions {
-//             optionDescription
-//             }
-//         }
-//     }
-// `
-// const DELETE_QUIZ_QUESTION = gql`
+const GET_QUIZ_DATA = gql`
+    mutation GetAllQuizDetailById($quizId: Float!) {
+    getAllQuizDetailById(quizId: $quizId) {
+        question {
+        id
+        questionDescription
+        optionConnection {
+            id 
+            optionDescription
+            isAnswer 
+        }
+        }
+    }
+    }
+`
+const DELETE_QUIZ_QUESTION = gql`
+    mutation DeleteQuestion($questionId: Float!) {
+        deleteQuestion(questionId: $questionId)
+    }
+`
 
-// `
-
-// const UPDATE_QUIZ_QUESTION = gql`
-
-// `
+const UPDATE_QUIZ_QUESTION = gql`
+        mutation UpdateQuizDetail($data: UpdateQuestionInput!) {
+            updateQuizDetail(data: $data)
+        }  
+`
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
@@ -47,16 +61,14 @@ export default function NewQuizPage(){
     // Data yang di pass
     const { state } = useLocation();
     const {createQuiz} = state;
-
+    
     const [createQuizDetail, createQuizDetailRes] = useMutation(CREATE_QUIZ_DETAIL)
-    // const [deleteQuizQuestion, deleteQuizQuestionRes] = useMutation(DELETE_QUIZ_QUESTION)
-    // const [updateQuizQuestion, updateQuizQuestionRes] = useMutation(UPDATE_QUIZ_QUESTION)
-    // const [getQuizData, getQuizDataRes] = useMutation(GET_QUIZ_DATA)
+    const [deleteQuizQuestion, deleteQuizQuestionRes] = useMutation(DELETE_QUIZ_QUESTION)
+    const [updateQuizDetail, updateQuizDetailRes] = useMutation(UPDATE_QUIZ_QUESTION)
+    const [getQuizData, getQuizDataRes] = useMutation(GET_QUIZ_DATA)
     
 
     const [sidebarOpen, setSidebarOpen] = useState(false)
-
-
 
     const newOpt1 = {
         questionId : 0,
@@ -77,69 +89,104 @@ export default function NewQuizPage(){
     const [answerD, setAnswerD] = useState("");
     const [selectedAnswer, setSelectedAnswer] = useState("");
 
-    // useEffect(() => {
-        
-    //     if(getQuizDataRes.data){
-
-    //         const quizDatas = getQuizDataRes.data.createQuizDetail
-
-    //         //masukin data kedalam array of quizData
-    //         quizDatas.map( (item) => {
-    //             console.log(item)
-    //             //nanti kita tinggal buat quizData baru append ke options
-    //             const quizData = {
-    //                 questionId : 0, // ambil dari mapping question id
-    //                 isNew : false,  // sset false
-    //                 question: "",  // ambil dari mapping
-    //                 answers:[{}] // ambil dari mapping
-    //             }
-
-    //             setOptions(option => [...options, quizData])
-    //         })
-
-    //         //append sebuah empty form keakhir
-    //         const newOpt1 = {
-    //             questionId : 0,
-    //             isNew : true, 
-    //             question: "", 
-    //             answers:[{}]
-    //         }
-
-    //         setCurrentQuestion(options.length);
-
-    //         setOptions(options => [...options , newOpt1])
-
-    //     }
-
-    // }, [getQuizDataRes.data]);
-
     useEffect(() => {
-        
-        //pake mutationnya getQuiz.id
+        if(getQuizDataRes.data){
 
+            const quizDatas = getQuizDataRes.data.getAllQuizDetailById
+            console.log(getQuizDataRes.data)
+            // masukin data kedalam array of quizData
+            quizDatas.map( (item) => {
+                const i = item.question
+                //nanti kita tinggal buat quizData baru append ke options
+                const quizData = {
+                    questionId : i.id, // ambil dari mapping question id
+                    isNew : false,  // sset false
+                    question: i.questionDescription,  // ambil dari mapping
+                    answers:i.optionConnection // ambil dari mapping
+                }
+            
+                setOptions(options => [quizData, ...options])
+              
+            })
+            setCurrentQuestion(quizDatas.length);
+        }
+
+    }, [getQuizDataRes.data]);
+    
+
+    const reloadData = () => {
+        getQuizData({
+            variables: {
+                quizId: createQuiz.id
+            }
+        });
+    }
+    
+    useEffect(() => {
+            
+        //pake mutationnya getQuiz.id
+        resetData()
+        reloadData()
+        
     }, []);
 
-    // useEffect(() => {
+    useEffect(() => {
 
-    //     if(deleteQuizQuestionRes.data){
-    //         //pake mutation getQuiz.id
-    //     }
+        if(deleteQuizQuestionRes.data){
+            window.location.reload()
+        }
 
-    // }, [deleteQuizQuestionRes.data])
+    }, [deleteQuizQuestionRes.data])
 
-    // useEffect(() => {
-    //     if(updateQuizQuestionRes.data){
-    //         //disini palingan keluarin something like update success
-    //     }
-    // }, [updateQuizQuestionRes.data])
+    useEffect(() => {
+        if(updateQuizDetailRes.data){
+            //disini palingan keluarin something like update success
+            window.location.reload()
+        }
+    }, [updateQuizDetailRes.data])
 
-    const updateQuiz = (questionId) => {
+    const updateQuiz = (q) => {
         //panggil mutation update quiz based on questionId.
-        
+        console.log(q)
+        updateQuizDetail({
+            variables:{
+                data:{
+                    questionId: q.questionId,
+                    questionDescription: question,
+                    options:[
+                        {
+                            optionId: q.answers[0].id,
+                            optionDescription: answerA,
+                            isAnswer: (selectedAnswer == "A" ? true : false)
+                        },
+                        {
+                            optionId: q.answers[1].id,
+                            optionDescription: answerB,
+                            isAnswer: (selectedAnswer == "B" ? true : false)
+                        },
+                        {
+                            optionId: q.answers[2].id,
+                            optionDescription: answerC,
+                            isAnswer: (selectedAnswer == "C" ? true : false)
+                        },
+                        {
+                            optionId: q.answers[3].id,
+                            optionDescription: answerD,
+                            isAnswer: (selectedAnswer == "D" ? true : false)
+                        },
+                    ]
+                }
+            }
+        })
     }
 
     const deleteItem = (questionId) =>{
         // panggil mutation untuk delete
+        deleteQuizQuestion({
+            variables: {
+                questionId: questionId
+            },
+        });
 
     }
 
@@ -186,23 +233,26 @@ export default function NewQuizPage(){
         if (createQuizDetailRes.data) {
             //disini palingan keluarin something like insert success
 
-            
-
             const quizData = createQuizDetailRes.data.createQuizDetail
+            console.log(quizData)
             const answers = [
                 {
+                    id: quizData.question.optionConnection[0].id,
                     optionDescription: answerA,
                     isAnswer: false
                 },
                 {
+                    id: quizData.question.optionConnection[1].id,
                     optionDescription: answerB,
                     isAnswer: false
                 },
                 {
+                    id: quizData.question.optionConnection[2].id,
                     optionDescription: answerC,
                     isAnswer: false
                 },
                 {
+                    id: quizData.question.optionConnection[3].id,
                     optionDescription: answerD,
                     isAnswer: false
                 },
@@ -446,7 +496,7 @@ export default function NewQuizPage(){
                                         </ul>
                                     </div>
                                     <div className="px-0 h-auto pt-5 sm:px-0 flex justify-between content-center">
-                                    {(options[currentQuestion].isNew) ? 
+                                    {(options[currentQuestion] === undefined || options[currentQuestion].isNew) ? 
                                         
                                             <button
                                                 type="button"
@@ -461,6 +511,7 @@ export default function NewQuizPage(){
                                             <button
                                                 type="button"
                                                 className="inline-flex items-center px-4 py-2 mr-5 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                                                onClick = {() => {updateQuiz(options[currentQuestion])}}
                                             >
                                                 Update
                                                 <SaveIcon className="ml-3 -mr-1 h-5 w-5" aria-hidden="true" />

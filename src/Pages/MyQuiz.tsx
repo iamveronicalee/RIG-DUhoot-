@@ -218,7 +218,7 @@ export default function MyQuiz(){
                     <div className="flex flex-col flex-center w-64 ">
                     {/* Sidebar component, swap this element with another sidebar if you like */}
                     <div className="flex flex-col h-0 flex-1 border-r border-gray-200">
-                        <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto bg-indigo-700">
+                        <div className="flex-1 flex flex-col pt-5 pb-4 mostly-customized-scrollbar overflow-y-auto bg-indigo-700">
                             <h1 className="text-center text-white font-bold text-xl">
                                 Unfinished Quiz
                             </h1>
@@ -238,7 +238,7 @@ export default function MyQuiz(){
                             ))}
                         </nav>
                         </div>
-                        <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto bg-indigo-700">
+                        <div className="flex-1 flex flex-col pt-5 pb-4 mostly-customized-scrollbar overflow-y-auto bg-indigo-700">
                             <h1 className="text-center text-white font-bold text-xl">
                                 Finished Quiz
                             </h1>

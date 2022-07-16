@@ -32,7 +32,7 @@ const CREATE_QUIZ = gql`
 const navigation = [
   { name: "Join a Quiz", href: "#", icon: LinkIcon, current: true},
   { name: "Create New Quiz", href: "#", icon: FolderAddIcon, current: false },
-  { name: "My Quiz", href: "#", icon: CollectionIcon, current: false },
+  { name: "My Quiz", href: "", icon: CollectionIcon, current: false },
   { name: "Quiz History", href: "#", icon: ClockIcon, current: false },
   { name: "Sign Out", href: "#", icon: LogoutIcon, current: false },
 ];
@@ -71,6 +71,8 @@ export default function Layout(props, { children }) {
   const [newQuizModalOpen, setNewQuizModalOpen] = useState(false);
   const [newQuizName, setNewQuizName] = useState("");
   const [createQuiz, createQuizRes] = useMutation(CREATE_QUIZ);
+  const [disableCreateQuiz, setDisableCreateQuiz] = useState(true);
+
   const [user, setUser] = useState("");
   
   const navigate = useNavigate();
@@ -96,7 +98,6 @@ export default function Layout(props, { children }) {
   useEffect(() => {
 
     if (createQuizRes.data) {
-      console.log(createQuizRes.data);
       navigate("/create-quiz", {state : createQuizRes.data})
     }
   }, [createQuizRes.data]);
@@ -216,12 +217,13 @@ export default function Layout(props, { children }) {
                 <nav className="mt-5 px-2 space-y-1">
                   {navigation.map((item) => {
                     let handleClick = () => {
+                      if(item.name == "Create New Quiz" && pathName == "Create New Quiz"){return}
                       clickMenu(item.name);
                     };
                     return (
                       <a
                         key={item.name}
-                        href={item.href}
+                        // href={item.href}
                         className={classNames(
                           item.current
                             ? "bg-blue-800 text-white"
@@ -376,7 +378,7 @@ export default function Layout(props, { children }) {
                   return (
                     <a
                       key={item.name}
-                      href={item.href}
+                      // href={item.href}
                       className={classNames(
                         item.current
                           ? "bg-blue-800 text-white"
