@@ -254,7 +254,7 @@ export default function Layout(props, { children }) {
                     </div>
                     <div className="ml-3">
                       <p className="text-base font-medium text-white">
-                        Tom Cook
+                        {user ? user : ""}
                       </p>
                     </div>
                   </div>
@@ -408,7 +408,7 @@ export default function Layout(props, { children }) {
                     />
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-white">Tom Cook</p>
+                    <p className="text-sm font-medium text-white">{user ? user : ""}</p>
                   </div>
                 </div>
               </a>

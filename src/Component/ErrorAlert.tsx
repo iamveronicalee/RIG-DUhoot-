@@ -6,7 +6,7 @@ export default function ErrorAlert(props) {
 
   const dismissError = () => {
     document.getElementById("error-alert-cont")!!.style.display = "none";
-    props.dismiss("")
+    props.dismiss("");
   };
 
   useEffect(() => {
