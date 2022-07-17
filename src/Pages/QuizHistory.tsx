@@ -105,6 +105,7 @@ export default function QuizHistory() {
           let check =
             quizHistoryRes.data.getAllQuizParticipant[i].quizConnection
               .isFinished;
+          // console.log(check)
           if (check == true) {
             let quizName =
               quizHistoryRes.data.getAllQuizParticipant[i].quizConnection
@@ -125,6 +126,7 @@ export default function QuizHistory() {
                 quizHistoryRes.data.getAllQuizParticipant[i].quizConnection.id,
               personScoreArr: personScoreArr,
             };
+
             setNavigation((navigation) => [...navigation, nav]);
           }
         }

@@ -1,11 +1,15 @@
 import { Transition, Dialog, Menu } from "@headlessui/react";
 import { XIcon, MenuIcon } from "@heroicons/react/outline";
 import React, { Fragment, useEffect, useState } from "react";
+
 import Layout from "../Component/Layout";
 import { gql } from "apollo-boost";
 import { useMutation } from "@apollo/react-hooks";
 import axios from "axios";
-import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
+import {
+  getSessionStorageOrDefault,
+  useSessionStorage,
+} from "../Utils/useSessionStorage";
 import { useNavigate } from "react-router-dom";
 import QuizComponent from "../Component/QuizComponent";
 import NoQuiz from "../Component/NoQuiz";
@@ -61,6 +65,8 @@ export default function MyQuiz() {
   const [currentQuizId, setCurrentQuizId] = useState(0);
   const [currentQuizName, setCurrentQuizName] = useState("");
 
+  const [quizSession, setQuizSession] = useSessionStorage("quizName", "");
+
   useEffect(() => {
     const token = getSessionStorageOrDefault("accessToken", "");
     if (token == "") {
@@ -88,7 +94,6 @@ export default function MyQuiz() {
 
   useEffect(() => {
     if (userMutateRes.data != undefined) {
-      console.log(userMutateRes.data.getUserByUsername.id);
       setUserId(userMutateRes.data.getUserByUsername.id);
     }
   }, [userMutateRes.data]);
@@ -105,10 +110,8 @@ export default function MyQuiz() {
 
   useEffect(() => {
     if (userQuizRes.data != undefined) {
-      // console.log(userQuizRes.data.getPersonQuizList)
       for (let i = 0; i < userQuizRes.data.getPersonQuizList.length; i++) {
         let quizName = userQuizRes.data.getPersonQuizList[i].quizName;
-        // console.log(quizName + " " + quizName.length)
         if (quizName.length >= 10) {
           quizName = quizName.substring(0, 10);
           quizName += "...";
@@ -116,7 +119,6 @@ export default function MyQuiz() {
 
         let isFinished = userQuizRes.data.getPersonQuizList[i].isFinished;
         let isStarted = userQuizRes.data.getPersonQuizList[i].isStart;
-        // console.log(isStart)
         let nav = {
           name: quizName,
           href: "#",
@@ -129,7 +131,6 @@ export default function MyQuiz() {
         } else {
           let personScoreArr =
             userQuizRes.data.getPersonQuizList[i].quizParticipantConnection;
-          // console.log(userQuizRes.data.getPersonQuizList[i])
           let obj = {
             name: quizName,
             href: "#",
@@ -144,16 +145,23 @@ export default function MyQuiz() {
     }
   }, [userQuizRes.data]);
 
+  const clearContent = () => {
+    let content = document.getElementById("quizList");
+    if (content != null) content.innerHTML = "";
+  };
+
   const quizClicked = (quizId, quizName) => {
+    setQuizSession(quizName);
     setIsQuizClicked(false);
-    setIsDoneClicked(false)
+    setIsDoneClicked(false);
     setCurrentQuizId(quizId);
     setCurrentQuizName(quizName);
     setIsQuizClicked(true);
   };
 
   const doneQuizClicked = (obj) => {
-    setIsQuizClicked(false)
+    clearContent();
+    setIsQuizClicked(false);
     setIsDoneClicked(false);
     setHistoryComponent(obj);
     setIsDoneClicked(true);
@@ -345,7 +353,7 @@ export default function MyQuiz() {
             </div>
 
             <main className="flex-1 z-0 focus:outline-none bg-indigo-800">
-              <div className="">
+              <div className="" id="quizList">
                 {isQuizClicked ? (
                   <QuizComponent
                     quizId={currentQuizId}
