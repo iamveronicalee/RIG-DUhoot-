@@ -3,6 +3,12 @@ import React, { useEffect, useState } from "react";
 import Layout from "../Component/Layout";
 
 export default function HomePage() {
+  const [roomID, setRoomID] = useState("");
+
+  useEffect(() => {
+    console.log(roomID);
+  }, [roomID]);
+
   return (
     <>
       <Layout key="" page={"Join a Quiz"}>
@@ -30,6 +36,7 @@ export default function HomePage() {
                         required
                         className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-md font-bold text-center"
                         placeholder="Enter Quiz Code"
+                        onChange={(e) => setRoomID(e.target.value)}
                       />
                     </div>
                   </div>
