@@ -71,7 +71,7 @@ export default function NewQuizPage() {
   // Data yang di pass
   const { state } = useLocation();
   const { createQuiz } = state;
-
+    
   const [createQuizDetail, createQuizDetailRes] =
     useMutation(CREATE_QUIZ_DETAIL);
   const [deleteQuizQuestion, deleteQuizQuestionRes] =
