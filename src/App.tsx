@@ -7,7 +7,6 @@ import LoginPage from "./Pages/LoginPage";
 import NewQuizPage from "./Pages/NewQuizPage";
 import MyQuiz from "./Pages/MyQuiz";
 import QuizHistory from "./Pages/QuizHistory";
-import QuizAnswerPage from "./Pages/QuizAnswerPage";
 import JoinQuizPage from "./Pages/JoinQuizPage";
 import QuizParticipantPage from "./Pages/QuizParticipantPage";
 import WaitingHost from "./Component/WaitingHost";

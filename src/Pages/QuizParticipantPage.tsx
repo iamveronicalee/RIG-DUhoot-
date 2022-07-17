@@ -1,3 +1,4 @@
+import { Server } from "http";
 import React, { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { socket } from "../Code/socket";
@@ -13,26 +14,39 @@ export default function QuizParticipantPage() {
   // Data yang di pass
   const { state } = useLocation();
   const navigate = useNavigate();
-  const location = state;
-  const [quizName, setQuizName] = useState("");
-  const [roomId, setRoomId] = useState("");
+  const { quizName, roomId } = state;
+  // const [quizName, setQuizName] = useState("");
+  // const [roomId, setRoomId] = useState("");
   const colors = ["red", "yellow", "green", "blue"];
   const [users, setUsers] = useState([]);
 
-  //SOCKET
+  const hostExitRoom = (thisRoomId) => {
+    console.log(thisRoomId);
+    socket.emit("close_room", {
+      roomId: thisRoomId,
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener("popstate", function (event) {
+      hostExitRoom(roomId);
+    });
+  }, []);
   useEffect(() => {
     if (location == null) {
       navigate("/");
     } else {
       console.log(location);
-      setQuizName(location.quizName);
-      setRoomId(location.roomId);
+      // setQuizName(location.quizName);
+      // setRoomId(location.roomId);
     }
   }, [location]);
+  //SOCKET
+
   useEffect(() => {
     socket.on("new_participant_join", (data) => {
       if (data) {
-        console.log(data);
+        // console.log(data);
         setUsers((users) => [...users, data.participantId]);
       }
     });

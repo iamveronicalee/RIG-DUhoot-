@@ -198,7 +198,6 @@ export default function QuizHistory() {
                       {navigation.map((item) => (
                         <a
                           key={item.name}
-                          href={item.href}
                           className={classNames(
                             item.current
                               ? "bg-indigo-100 text-indigo-900"
@@ -231,7 +230,6 @@ export default function QuizHistory() {
                       navigation.map((item) => (
                         <a
                           key={item.name}
-                          href={item.href}
                           className="flex justify-center"
                           onClick={() => quizBubbleClicked(item.personScoreArr)}
                         >

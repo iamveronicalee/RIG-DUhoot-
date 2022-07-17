@@ -45,12 +45,13 @@ export default function HomePage() {
   useEffect(() => {
     socket.on("join_room_feedback", (data) => {
       console.log(data);
-      if (data) {
+      if (data.isSuccess) {
         //kalau sucess join
-        console.log("JOINED ROOM " + roomID);
+        const roomId = data.roomId;
+        console.log("JOINED ROOM " + roomId);
 
         //redirect ke page waiting for host
-        navigate("/waiting-host");
+        navigate("/waiting-host", { state: { roomId } });
       } else {
         //kalau ditolak (room ga ada dll.)
         console.log("JOINED ROOM ERROR");

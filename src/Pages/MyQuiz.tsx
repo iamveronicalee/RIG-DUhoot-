@@ -220,7 +220,6 @@ export default function MyQuiz() {
                         navigation.map((item) => (
                           <a
                             key={item.name}
-                            href={item.href}
                             className={classNames(
                               item.current
                                 ? "bg-green-100 text-green-900"
@@ -243,7 +242,6 @@ export default function MyQuiz() {
                         doneQuiz.map((item) => (
                           <a
                             key={item.name}
-                            href={item.href}
                             className={classNames(
                               item.current
                                 ? "bg-red-100 text-red-900"
@@ -284,7 +282,6 @@ export default function MyQuiz() {
                       navigation.map((item) => (
                         <a
                           key={item.name}
-                          href={item.href}
                           className="flex justify-center"
                           onClick={() => quizClicked(item.quizId, item.name)}
                         >
@@ -313,7 +310,6 @@ export default function MyQuiz() {
                       doneQuiz.map((item) => (
                         <a
                           key={item.name}
-                          href={item.href}
                           className="flex justify-center"
                           onClick={() => doneQuizClicked(item.personScoreArr)}
                         >
