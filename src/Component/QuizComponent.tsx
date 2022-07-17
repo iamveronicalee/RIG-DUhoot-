@@ -128,7 +128,6 @@ export default function QuizComponent({ quizId, quizName }) {
   const [answerC, setAnswerC] = useState("");
   const [answerD, setAnswerD] = useState("");
   const [selectedAnswer, setSelectedAnswer] = useState("");
-
   //SOCKET
 
   const generateRoomId = () => {
@@ -150,6 +149,9 @@ export default function QuizComponent({ quizId, quizName }) {
       if (data) {
         //kalau room dah dibuat host bakal kemana
         console.log("CREATE ROOM SUCCESS");
+        navigate("/quiz-participants", {
+          state: { quizName: quizName, roomId: data.roomId },
+        });
       } else {
         //kalau gagal buat room.
         console.log("CREATE ROOM ERROR");

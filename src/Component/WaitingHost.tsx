@@ -1,8 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactLoading from "react-loading";
+import { socket } from "../Code/socket";
 import StellarBackground from "./StellarBackground";
 
 export default function WaitingHost() {
+  //SOCKET
+
+  const generateRoomId = () => {
+    return Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+  };
+
+  const leaveRoom = () => {};
+
+  useEffect(() => {}, [socket]);
+  //ENDSOCKET
+
   return (
     <div className="h-screen flex content-center justify-center overflow-hidden bg-indigo-900">
       <StellarBackground />

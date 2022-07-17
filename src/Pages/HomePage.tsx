@@ -50,6 +50,7 @@ export default function HomePage() {
         console.log("JOINED ROOM " + roomID);
 
         //redirect ke page waiting for host
+        navigate("/waiting-host");
       } else {
         //kalau ditolak (room ga ada dll.)
         console.log("JOINED ROOM ERROR");

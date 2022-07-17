@@ -9,11 +9,18 @@ import MyQuiz from "./Pages/MyQuiz";
 import QuizHistory from "./Pages/QuizHistory";
 import QuizAnswerPage from "./Pages/QuizAnswerPage";
 import JoinQuizPage from "./Pages/JoinQuizPage";
+import QuizParticipantPage from "./Pages/QuizParticipantPage";
+import WaitingHost from "./Component/WaitingHost";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/waiting-host" element={<WaitingHost />}></Route>
+        <Route
+          path="/quiz-participants"
+          element={<QuizParticipantPage />}
+        ></Route>
         <Route path="/quiz" element={<JoinQuizPage />}></Route>
         <Route path="/create-quiz" element={<NewQuizPage />}></Route>
         <Route path="/" element={<HomePage />}></Route>
