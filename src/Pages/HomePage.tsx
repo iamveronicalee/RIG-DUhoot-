@@ -22,6 +22,12 @@ const JOIN_QUIZ = gql`
 `;
 
 export default function HomePage() {
+  const [roomID, setRoomID] = useState("");
+
+  useEffect(() => {
+    console.log(roomID);
+  }, [roomID]);
+
   const [userMutate, userMutateRes] = useMutation(GET_USER_BY_USERNAME);
   const [joinQuizQuery, joinQuizRes] = useMutation(JOIN_QUIZ);
   const [userId, setUserId] = useState(0);
@@ -60,25 +66,25 @@ export default function HomePage() {
     }
   }, [userMutateRes.data]);
 
-  const joinQuiz = (e) => {
-    e.preventDefault();
-    joinQuizQuery({
-      variables: {
-        participantId: userId,
-        quizId: quizId,
-      },
-    });
+  // const joinQuiz = (e) => {
+  //   e.preventDefault();
+  //   joinQuizQuery({
+  //     variables: {
+  //       participantId: userId,
+  //       quizId: quizId,
+  //     },
+  //   });
 
-    // console.log("successfully added new")
-  };
+  //   // console.log("successfully added new")
+  // };
 
-  useEffect(() => {
-    if (joinQuizRes.data != undefined) {
-      if (joinQuizRes.data.createQuizParticipant == false) {
-        console.log("eror gabisa join");
-      }
-    }
-  }, [joinQuizRes.data]);
+  // useEffect(() => {
+  //   if (joinQuizRes.data != undefined) {
+  //     if (joinQuizRes.data.createQuizParticipant == false) {
+  //       console.log("eror gabisa join");
+  //     }
+  //   }
+  // }, [joinQuizRes.data]);
 
   return (
     <>
@@ -107,7 +113,7 @@ export default function HomePage() {
                         required
                         className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-md font-bold text-center"
                         placeholder="Enter Quiz Code"
-                        onChange={(e) => setQuizId(parseInt(e.target.value))}
+                        onChange={(e) => setRoomID(e.target.value)}
                       />
                     </div>
                   </div>
@@ -116,7 +122,7 @@ export default function HomePage() {
                     <button
                       type="submit"
                       className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      onClick={() => joinQuiz(event)}
+                      // onClick={() => joinQuiz(event)}
                     >
                       <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                         <LinkIcon

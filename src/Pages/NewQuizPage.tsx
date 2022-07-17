@@ -111,7 +111,9 @@ export default function NewQuizPage() {
       const quizDatas = getQuizDataRes.data.getAllQuizDetailById;
       console.log(getQuizDataRes.data);
       // masukin data kedalam array of quizData
-      setOptions([newOpt1]);
+      // setOptions([newOpt1]);
+      var arr = [{}];
+      arr.pop();
       quizDatas.map((item) => {
         const i = item.question;
         //nanti kita tinggal buat quizData baru append ke options
@@ -121,9 +123,14 @@ export default function NewQuizPage() {
           question: i.questionDescription, // ambil dari mapping
           answers: i.optionConnection, // ambil dari mapping
         };
-
-        setOptions((options) => [quizData, ...options]);
+        arr = [...arr, quizData];
       });
+      console.log(arr.length);
+      if (arr.length == 1) setOptions([newOpt1]);
+      else {
+        arr = [...arr, newOpt1];
+        setOptions(arr);
+      }
       setCurrentQuestion(quizDatas.length);
     }
   }, [getQuizDataRes.data]);
