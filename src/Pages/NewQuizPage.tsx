@@ -406,7 +406,6 @@ export default function NewQuizPage() {
                           onClick={() => {
                             updateUI(item);
                           }}
-                          className="flex content-center justify-center w-3/4 py-5 my-3 border border-transparent text-2xl font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md"
                           className={isActive(options.indexOf(item))}
                         >
                           {options.indexOf(item) + 1}
@@ -436,7 +435,6 @@ export default function NewQuizPage() {
                         onClick={() => {
                           updateUI(item);
                         }}
-                        className="flex content-center justify-center w-3/4 py-5 my-3 border border-transparent text-2xl font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md"
                         className={isActive(options.indexOf(item))}
                       >
                         {options.indexOf(item) + 1}

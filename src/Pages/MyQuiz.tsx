@@ -115,8 +115,6 @@ export default function MyQuiz() {
 
         if (isFinished == false) {
           setNavigation((navigation) => [...navigation, nav]);
-        } else if (isStarted == true) {
-          setOnGoingQuiz((onGoingQuiz) => [...onGoingQuiz, nav]);
         } else {
           setDoneQuiz((doneQuiz) => [...doneQuiz, nav]);
         }
@@ -205,22 +203,6 @@ export default function MyQuiz() {
                       ))}
                     </nav>
                     <nav className="mt-5 px-2 space-y-1">
-                      {onGoingQuiz.map((item) => (
-                        <a
-                          key={item.name}
-                          href={item.href}
-                          className={classNames(
-                            item.current
-                              ? "bg-yellow-100 text-yellow-900"
-                              : "text-yellow-600 hover:bg-yellow-50 hover:text-yellow-900",
-                            "group flex items-center px-2 py-2 text-base font-medium rounded-md font-bold"
-                          )}
-                        >
-                          {item.name}
-                        </a>
-                      ))}
-                    </nav>
-                    <nav className="mt-5 px-2 space-y-1">
                       {doneQuiz.map((item) => (
                         <a
                           key={item.name}
@@ -265,28 +247,6 @@ export default function MyQuiz() {
                         <button
                           type="button"
                           className="flex items-center px-5 py-3 m-2 my-4 border border-transparent text-base font-medium rounded shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 w-full "
-                        >
-                          {item.name}
-                        </button>
-                      </a>
-                    ))}
-                  </nav>
-                </div>
-
-                <div className="flex-1 flex flex-col pt-5 pb-4 mostly-customized-scrollbar  overflow-y-auto bg-indigo-700">
-                  <h1 className="text-center text-white font-bold text-xl">
-                    Ongoing Quiz
-                  </h1>
-                  <nav className="mt-5 flex-1 justify-center px-2 space-y-1 text-center bg-indigo-800">
-                    {onGoingQuiz.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className="flex justify-center"
-                      >
-                        <button
-                          type="button"
-                          className="flex items-center px-5 py-3 m-2 my-4 border border-transparent text-base font-medium rounded shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 w-full "
                         >
                           {item.name}
                         </button>

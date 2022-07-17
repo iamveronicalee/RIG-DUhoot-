@@ -90,28 +90,26 @@ export default function QuizComponent({quizId, quizName}){
     const [selectedAnswer, setSelectedAnswer] = useState("");
 
     useEffect(() => {
-        if(getQuizDataRes.data){
-
-            const quizDatas = getQuizDataRes.data.getAllQuizDetailById
-            console.log(getQuizDataRes.data)
-            // masukin data kedalam array of quizData
-            quizDatas.map( (item) => {
-                const i = item.question
-                //nanti kita tinggal buat quizData baru append ke options
-                const quizData = {
-                    questionId : i.id, // ambil dari mapping question id
-                    isNew : false,  // sset false
-                    question: i.questionDescription,  // ambil dari mapping
-                    answers:i.optionConnection // ambil dari mapping
-                }
-            
-                setOptions(options => [quizData, ...options])
-              
-            })
-            setCurrentQuestion(quizDatas.length);
+        if (getQuizDataRes.data) {
+          const quizDatas = getQuizDataRes.data.getAllQuizDetailById;
+          console.log(getQuizDataRes.data);
+          // masukin data kedalam array of quizData
+          setOptions([newOpt1]);
+          quizDatas.map((item) => {
+            const i = item.question;
+            //nanti kita tinggal buat quizData baru append ke options
+            const quizData = {
+              questionId: i.id, // ambil dari mapping question id
+              isNew: false, // sset false
+              question: i.questionDescription, // ambil dari mapping
+              answers: i.optionConnection, // ambil dari mapping
+            };
+    
+            setOptions((options) => [quizData, ...options]);
+          });
+          setCurrentQuestion(quizDatas.length);
         }
-
-    }, [getQuizDataRes.data]);
+      }, [getQuizDataRes.data]);
     
 
     const reloadData = () => {
