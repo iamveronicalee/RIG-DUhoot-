@@ -3,14 +3,11 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import ApolloClient from "apollo-boost";
-import {
-  ApolloProvider,
-  InMemoryCache,
-} from "@apollo/react-hooks";
+import { ApolloProvider, InMemoryCache } from "@apollo/react-hooks";
 
 const client = new ApolloClient<InMemoryCache>({
   uri: "http://localhost:9000/graphql",
-  cache: new InMemoryCache() as any
+  cache: new InMemoryCache() as any,
 });
 
 ReactDOM.render(

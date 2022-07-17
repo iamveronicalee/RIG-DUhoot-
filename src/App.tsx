@@ -8,21 +8,19 @@ import NewQuizPage from "./Pages/NewQuizPage";
 import MyQuiz from "./Pages/MyQuiz";
 import QuizHistory from "./Pages/QuizHistory";
 import QuizAnswerPage from "./Pages/QuizAnswerPage";
-import TestSocket from "./Pages/TestSocket";
+import JoinQuizPage from "./Pages/JoinQuizPage";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/test-socket" element={<TestSocket />}></Route>
-        <Route path="/quiz" element={<QuizAnswerPage />}></Route>
+        <Route path="/quiz" element={<JoinQuizPage />}></Route>
         <Route path="/create-quiz" element={<NewQuizPage />}></Route>
         <Route path="/" element={<HomePage />}></Route>
         <Route path="/my-quiz" element={<MyQuiz />}></Route>
         <Route path="/quiz-history" element={<QuizHistory />}></Route>
         <Route path="/auth/login" element={<LoginPage />}></Route>
         <Route path=""> </Route>
-
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
