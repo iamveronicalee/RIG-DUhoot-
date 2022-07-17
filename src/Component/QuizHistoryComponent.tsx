@@ -11,10 +11,18 @@ export default function QuizHistoryComponent({ objectArr }) {
 
   const loadData = () => {
     for (let i = 0; i < objectArr.length; i++) {
+      let bgColor = "bg-red-600";
+      let score = objectArr[i].score;
+      if (score >= 50){
+        bgColor = "bg-yellow-600";
+      }
+      else if (score >= 85){
+        bgColor = "bg-green-600";
+      }
       let obj = {
         name: objectArr[i].participantConnection.userName,
         score: objectArr[i].score,
-        bgColor: "bg-purple-600",
+        bgColor: bgColor,
       };
       //   console.log('inner')
       setUserScoreList((userScoreList) => [...userScoreList, obj]);

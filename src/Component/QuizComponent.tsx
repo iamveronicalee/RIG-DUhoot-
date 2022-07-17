@@ -19,7 +19,10 @@ import React, { Fragment, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { socket } from "../Code/socket";
 import Layout from "../Component/Layout";
-import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
+import {
+  getSessionStorageOrDefault,
+  useSessionStorage,
+} from "../Utils/useSessionStorage";
 
 const CREATE_QUIZ_DETAIL = gql`
   mutation CreateQuizDetail(
@@ -147,10 +150,11 @@ export default function QuizComponent({ quizId, quizName }) {
   useEffect(() => {
     socket.on("create_room_feedback", (data) => {
       if (data) {
+        let quizFinalName = getSessionStorageOrDefault("quizName", "");
         //kalau room dah dibuat host bakal kemana
         console.log("CREATE ROOM SUCCESS");
         navigate("/quiz-participants", {
-          state: { quizName: quizName, roomId: data.roomId },
+          state: { quizName: quizFinalName, roomId: data.roomId },
         });
       } else {
         //kalau gagal buat room.

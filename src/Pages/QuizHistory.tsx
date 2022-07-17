@@ -105,6 +105,7 @@ export default function QuizHistory() {
           let check =
             quizHistoryRes.data.getAllQuizParticipant[i].quizConnection
               .isFinished;
+          // console.log(check)
           if (check == true) {
             let quizName =
               quizHistoryRes.data.getAllQuizParticipant[i].quizConnection
@@ -125,6 +126,7 @@ export default function QuizHistory() {
                 quizHistoryRes.data.getAllQuizParticipant[i].quizConnection.id,
               personScoreArr: personScoreArr,
             };
+
             setNavigation((navigation) => [...navigation, nav]);
           }
         }
@@ -198,7 +200,6 @@ export default function QuizHistory() {
                       {navigation.map((item) => (
                         <a
                           key={item.name}
-                          href={item.href}
                           className={classNames(
                             item.current
                               ? "bg-indigo-100 text-indigo-900"
@@ -231,7 +232,6 @@ export default function QuizHistory() {
                       navigation.map((item) => (
                         <a
                           key={item.name}
-                          href={item.href}
                           className="flex justify-center"
                           onClick={() => quizBubbleClicked(item.personScoreArr)}
                         >
