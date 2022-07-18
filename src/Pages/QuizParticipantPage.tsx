@@ -1,8 +1,13 @@
+import { ArrowCircleLeftIcon } from "@heroicons/react/outline";
 import { Server } from "http";
 import React, { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { socket } from "../Code/socket";
 import StellarBackground from "../Component/StellarBackground";
+import {
+  getSessionStorageOrDefault,
+  useSessionStorage,
+} from "../Utils/useSessionStorage";
 
 const genrateRandomNumber = (min: number, max: number) => {
   min = Math.ceil(min);
@@ -13,41 +18,70 @@ const genrateRandomNumber = (min: number, max: number) => {
 export default function QuizParticipantPage() {
   // Data yang di pass
   const { state } = useLocation();
-  const navigate = useNavigate();
-  const { quizName, roomId } = state;
-  // const [quizName, setQuizName] = useState("");
-  // const [roomId, setRoomId] = useState("");
+  const location = state;
+  const [quizName, setQuizName] = useState("");
+  const [roomId, setRoomId] = useState("");
   const colors = ["red", "yellow", "green", "blue"];
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const navigate = useNavigate();
+  const [participantSession, setParticipantSession] = useSessionStorage(
+    "participants",
+    []
+  );
 
   const hostExitRoom = (thisRoomId) => {
-    console.log(thisRoomId);
     socket.emit("close_room", {
       roomId: thisRoomId,
     });
+    window.history.replaceState({}, document.title);
+    navigate("/");
   };
+
+  useEffect(() => {
+    if (location == null) {
+      navigate("/");
+    } else {
+      setQuizName(location.quizName);
+      setRoomId(location.roomId);
+    }
+  }, [location]);
 
   useEffect(() => {
     window.addEventListener("popstate", function (event) {
       hostExitRoom(roomId);
     });
-  }, []);
-  useEffect(() => {
-    if (location == null) {
-      navigate("/");
-    } else {
-      console.log(location);
-      // setQuizName(location.quizName);
-      // setRoomId(location.roomId);
-    }
-  }, [location]);
+  }, [roomId]);
   //SOCKET
 
   useEffect(() => {
     socket.on("new_participant_join", (data) => {
       if (data) {
-        // console.log(data);
+        console.log(data);
         setUsers((users) => [...users, data.participantId]);
+        setParticipantSession((participantSession) => [
+          ...participantSession,
+          data.participantId,
+        ]);
+        console.log(getSessionStorageOrDefault("participants", []));
+      }
+    });
+    socket.on("new_participant_leave", (data) => {
+      console.log(data);
+      if (data.participanId != "") {
+        const participantId = data.participantId;
+        let participantArr = getSessionStorageOrDefault("participants", []);
+
+        let arr = [""];
+        arr.pop();
+        for (let i = 0; i < participantArr.length; i++) {
+          console.log(participantArr[i], participantId);
+          if (participantArr[i] != participantId) {
+            arr = [...arr, participantArr[i]];
+          }
+        }
+        console.log("arr = ", arr);
+        setParticipantSession(arr);
+        setUsers(arr);
       }
     });
   }, [socket]);

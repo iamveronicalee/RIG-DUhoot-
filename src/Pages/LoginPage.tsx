@@ -25,7 +25,7 @@ export default function LoginPage() {
   function fetchLecturer() {
     const lectData = {
       username: username.toLowerCase(),
-      password: EncryptToBase64(username.toLowerCase(), password), 
+      password: EncryptToBase64(username.toLowerCase(), password),
     };
 
     axios
@@ -56,7 +56,7 @@ export default function LoginPage() {
       .post("http://localhost:9000/auth/login", data)
       .then((response) => {
         let data = response.data;
-        console.log(data)
+        console.log(data);
         if (data.accessToken == undefined) {
           fetchLecturer();
         } else {

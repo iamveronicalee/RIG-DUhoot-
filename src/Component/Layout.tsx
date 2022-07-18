@@ -13,7 +13,10 @@ import {
 import { gql } from "apollo-boost";
 import { useMutation } from "@apollo/react-hooks";
 import axios from "axios";
-import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
+import {
+  getSessionStorageOrDefault,
+  useSessionStorage,
+} from "../Utils/useSessionStorage";
 import { useNavigate } from "react-router-dom";
 
 function classNames(...classes) {
@@ -82,7 +85,7 @@ export default function Layout(props, { children }) {
   const [disableCreateQuiz, setDisableCreateQuiz] = useState(true);
   const [user, setUser] = useState("");
   const [username, setUsername] = useState("");
-
+  const [count, setCount] = useSessionStorage("count", "");
   const navigate = useNavigate();
   const createNewQuizButtonRef = useRef();
 
