@@ -8,6 +8,17 @@ import {
 } from "../Utils/useSessionStorage";
 import { useNavigate } from "react-router-dom";
 import ErrorAlert from "../Component/ErrorAlert";
+import gql from "graphql-tag";
+import { useMutation } from "@apollo/client";
+import { useCookies } from "react-cookie";
+
+const LOGIN_RESPONSE = gql`
+  mutation Mutation($userName: String!) {
+    login(userName: $userName) {
+      accessToken
+    }
+  }
+`;
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -15,17 +26,42 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   const [accessToken, setAccessToken] = useSessionStorage("accessToken", "");
+  const [getLoginResponse, getLoginResponseRes] = useMutation(LOGIN_RESPONSE);
+  const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
 
   useEffect(() => {
-    if (getSessionStorageOrDefault("accessToken", "") != "") {
+    const token = getSessionStorageOrDefault("accessToken", "");
+    if (
+      token != "" ||
+      (Object.keys(cookies).length != 0 && cookies.jid != "")
+    ) {
       navigate("/");
     }
   }, []);
 
+  useEffect(() => {
+    if (getLoginResponseRes.data) {
+      const token = getLoginResponseRes.data.login.accessToken
+      setAccessToken(token);
+      setCookie("jid", token, {
+        path: "/",
+      });
+      navigate("/");
+    }
+  }, [getLoginResponseRes.data]);
+
+  function loginResponse() {
+    getLoginResponse({
+      variables: {
+        userName: username,
+      },
+    });
+  }
+
   function fetchLecturer() {
     const lectData = {
       username: username.toLowerCase(),
-      password: EncryptToBase64(username.toLowerCase(), password), 
+      password: EncryptToBase64(username.toLowerCase(), password),
     };
 
     axios
@@ -36,8 +72,7 @@ export default function LoginPage() {
           setErrorMessage("Authentication Failed!");
         } else {
           // lecturer found
-          setAccessToken(data.accessToken);
-          navigate("/");
+          loginResponse();
         }
       })
       .catch((error) => {
@@ -56,19 +91,18 @@ export default function LoginPage() {
       .post("http://localhost:9000/auth/login", data)
       .then((response) => {
         let data = response.data;
-        console.log(data)
         if (data.accessToken == undefined) {
           fetchLecturer();
         } else {
           // student found
-          setAccessToken(data.accessToken);
-          navigate("/");
+          loginResponse();
         }
       })
       .catch((error) => {
         console.log(error);
       });
   }
+  const [count, setCount] = useState(0);
 
   return (
     <div className="min-h-screen flex flex-col justify-center bg-blue-900 py-12 sm:px-6 lg:px-8">

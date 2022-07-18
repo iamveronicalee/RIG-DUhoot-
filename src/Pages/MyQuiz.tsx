@@ -38,7 +38,7 @@ const GET_USER_BY_USERNAME = gql`
 `;
 
 export default function MyQuiz() {
-  const [isQuizClicked, setIsQuizClicked] = useState(false)
+  const [isQuizClicked, setIsQuizClicked] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [navigation, setNavigation] = useState<any[]>([]);
   const [doneQuiz, setDoneQuiz] = useState<any[]>([]);
@@ -48,16 +48,7 @@ export default function MyQuiz() {
   const [userId, setUserId] = useState(0);
   const navigate = useNavigate();
   const [currentQuizId, setCurrentQuizId] = useState(0);
-  const [currentQuizName, setCurrentQuizName] = useState("")
-
-  useEffect(() => {
-    const token = getSessionStorageOrDefault("accessToken", "");
-    if (token == "") {
-      navigate("/auth/login");
-    } else {
-      fetchUser(token);
-    }
-  }, []);
+  const [currentQuizName, setCurrentQuizName] = useState("");
 
   const fetchUser = (token) => {
     axios
@@ -122,12 +113,12 @@ export default function MyQuiz() {
     }
   }, [userQuizRes.data]);
 
-  const quizClicked = (quizId, quizName)=>{
-    setIsQuizClicked(false)
-    setCurrentQuizId(quizId)
-    setCurrentQuizName(quizName)
-    setIsQuizClicked(true)
-  }
+  const quizClicked = (quizId, quizName) => {
+    setIsQuizClicked(false);
+    setCurrentQuizId(quizId);
+    setCurrentQuizName(quizName);
+    setIsQuizClicked(true);
+  };
 
   return (
     <>
@@ -294,12 +285,14 @@ export default function MyQuiz() {
 
             <main className="flex-1 z-0 focus:outline-none">
               <div className="">
-                {
-                (isQuizClicked)
-                  ? <QuizComponent quizId={currentQuizId} quizName={currentQuizName} />
-                  : <div>hehe</div>
-                }
-
+                {isQuizClicked ? (
+                  <QuizComponent
+                    quizId={currentQuizId}
+                    quizName={currentQuizName}
+                  />
+                ) : (
+                  <div>hehe</div>
+                )}
               </div>
             </main>
           </div>

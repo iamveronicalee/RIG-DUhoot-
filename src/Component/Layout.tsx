@@ -13,8 +13,12 @@ import {
 import { gql } from "apollo-boost";
 import { useMutation } from "@apollo/react-hooks";
 import axios from "axios";
-import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
+import {
+  getSessionStorageOrDefault,
+  useSessionStorage,
+} from "../Utils/useSessionStorage";
 import { useNavigate } from "react-router-dom";
+import { Cookies, useCookies } from "react-cookie";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -82,6 +86,8 @@ export default function Layout(props, { children }) {
   const [disableCreateQuiz, setDisableCreateQuiz] = useState(true);
   const [user, setUser] = useState("");
   const [username, setUsername] = useState("");
+  const [accessToken, setAccessToken] = useSessionStorage("accessToken", "");
+  const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
 
   const navigate = useNavigate();
   const createNewQuizButtonRef = useRef();
@@ -92,10 +98,18 @@ export default function Layout(props, { children }) {
 
   useEffect(() => {
     const token = getSessionStorageOrDefault("accessToken", "");
-    if (token == "") {
+    if (
+      token == "" &&
+      (Object.keys(cookies).length == 0 ||
+        (Object.keys(cookies).length > 0 && cookies.jid == ""))
+    ) {
       navigate("/auth/login");
     } else {
-      fetchUser(token);
+      if (token != "") {
+        fetchUser(token);
+      } else {
+        fetchUser(cookies.jid);
+      }
     }
   }, []);
 
@@ -113,10 +127,9 @@ export default function Layout(props, { children }) {
         },
       })
       .then((response) => {
-        // console.log(response.data)
         // console.log(response.data.realname)
         setUsername(response.data.realname);
-        setUser(response.data.username);
+        setUser(response.data.user.userName);
       });
   };
 
@@ -156,7 +169,24 @@ export default function Layout(props, { children }) {
     navigate("/quiz-history");
   };
 
-  const signOut = () => {};
+  const signOut = () => {
+    const token = getSessionStorageOrDefault("accessToken", "");
+    axios
+      .delete("http://localhost:9000/auth/logout", token)
+      .then((response) => {
+        if (response.status == 204) {
+          setAccessToken("");
+          removeCookie("jid");
+          navigate("/auth/login");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setAccessToken("");
+        removeCookie("jid");
+        navigate("/auth/login");
+      });
+  };
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
@@ -256,9 +286,7 @@ export default function Layout(props, { children }) {
                       />
                     </div>
                     <div className="ml-3">
-                      <p className="text-base font-medium text-white">
-                        {username}
-                      </p>
+                      <p className="text-base font-medium text-white">{user}</p>
                     </div>
                   </div>
                 </a>
@@ -411,7 +439,7 @@ export default function Layout(props, { children }) {
                     />
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-white">{username}</p>
+                    <p className="text-sm font-medium text-white">{user}</p>
                   </div>
                 </div>
               </a>

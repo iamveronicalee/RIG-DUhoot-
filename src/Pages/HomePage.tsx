@@ -5,7 +5,6 @@ import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
 const GET_USER_BY_USERNAME = gql`
   mutation getUserByUsername($username: String!) {
     getUserByUsername(username: $username) {
@@ -33,15 +32,6 @@ export default function HomePage() {
   const [userId, setUserId] = useState(0);
   const navigate = useNavigate();
   const [quizId, setQuizId] = useState(0);
-
-  useEffect(() => {
-    const token = getSessionStorageOrDefault("accessToken", "");
-    if (token == "") {
-      navigate("/auth/login");
-    } else {
-      fetchUser(token);
-    }
-  }, []);
 
   const fetchUser = (token) => {
     axios

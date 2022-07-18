@@ -2,20 +2,16 @@ import { useMutation } from "@apollo/react-hooks";
 import { Transition, Dialog } from "@headlessui/react";
 import {
   XIcon,
-  MenuAlt2Icon,
-  SearchIcon,
-  BellIcon,
-  LinkIcon,
   MenuIcon,
   PlusIcon,
   TrashIcon,
   SaveIcon,
-  QrcodeIcon,
 } from "@heroicons/react/outline";
 import { gql } from "apollo-boost";
 import React, { Fragment, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Layout from "../Component/Layout";
+import AlertModal from "../Component/AlertModal";
 
 const CREATE_QUIZ_DETAIL = gql`
   mutation CreateQuizDetail(
@@ -71,7 +67,7 @@ export default function NewQuizPage() {
   // Data yang di pass
   const { state } = useLocation();
   const { createQuiz } = state;
-    
+
   const [createQuizDetail, createQuizDetailRes] =
     useMutation(CREATE_QUIZ_DETAIL);
   const [deleteQuizQuestion, deleteQuizQuestionRes] =
@@ -81,7 +77,8 @@ export default function NewQuizPage() {
   const [getQuizData, getQuizDataRes] = useMutation(GET_QUIZ_DATA);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState(true);
   const newOpt1 = {
     questionId: 0,
     isNew: true,
@@ -151,20 +148,29 @@ export default function NewQuizPage() {
 
   useEffect(() => {
     if (deleteQuizQuestionRes.data) {
-      window.location.reload();
+      setAlertMessage("Delete");
     }
   }, [deleteQuizQuestionRes.data]);
 
   useEffect(() => {
     if (updateQuizDetailRes.data) {
-      //disini palingan keluarin something like update success
-      window.location.reload();
+      setAlertMessage("Update");
     }
   }, [updateQuizDetailRes.data]);
 
   const updateQuiz = (q) => {
+    if (
+      question.trim() == "" ||
+      answerA.trim() == "" ||
+      answerB.trim() == "" ||
+      answerC.trim() == "" ||
+      answerD.trim() == "" ||
+      selectedAnswer.trim() == ""
+    ) {
+      setAlertType(false);
+      setAlertMessage("Update");
+    }
     //panggil mutation update quiz based on questionId.
-    console.log(q);
     updateQuizDetail({
       variables: {
         data: {
@@ -216,7 +222,6 @@ export default function NewQuizPage() {
   };
 
   const updateUI = (i) => {
-    console.log(i);
     resetData();
     if (!i.isNew) {
       setCurrentQuestion(options.indexOf(i));
@@ -243,10 +248,8 @@ export default function NewQuizPage() {
 
   useEffect(() => {
     if (createQuizDetailRes.data) {
-      //disini palingan keluarin something like insert success
-
+      setAlertMessage("Insert");
       const quizData = createQuizDetailRes.data.createQuizDetail;
-      console.log(quizData);
       const answers = [
         {
           id: quizData.question.optionConnection[0].id,
@@ -285,8 +288,6 @@ export default function NewQuizPage() {
       options[currentQuestion].question = question;
       options[currentQuestion].answers = answers;
 
-      console.log(createQuizDetailRes.data.createQuizDetail);
-
       resetData();
       const newOpt1 = {
         questionId: 0,
@@ -301,48 +302,58 @@ export default function NewQuizPage() {
 
   const insertQuestion = () => {
     //validasi
+    if (
+      question.trim() == "" ||
+      answerA.trim() == "" ||
+      answerB.trim() == "" ||
+      answerC.trim() == "" ||
+      answerD.trim() == "" ||
+      selectedAnswer.trim() == ""
+    ) {
+      setAlertType(false);
+      setAlertMessage("Insert");
+    } else {
+      //ambil data
+      const answers = [
+        {
+          optionDescription: answerA,
+          isAnswer: false,
+        },
+        {
+          optionDescription: answerB,
+          isAnswer: false,
+        },
+        {
+          optionDescription: answerC,
+          isAnswer: false,
+        },
+        {
+          optionDescription: answerD,
+          isAnswer: false,
+        },
+      ];
 
-    //ambil data
+      if (selectedAnswer == "A") {
+        answers[0].isAnswer = true;
+      } else if (selectedAnswer == "B") {
+        answers[1].isAnswer = true;
+      } else if (selectedAnswer == "C") {
+        answers[2].isAnswer = true;
+      } else if (selectedAnswer == "D") {
+        answers[3].isAnswer = true;
+      }
 
-    const answers = [
-      {
-        optionDescription: answerA,
-        isAnswer: false,
-      },
-      {
-        optionDescription: answerB,
-        isAnswer: false,
-      },
-      {
-        optionDescription: answerC,
-        isAnswer: false,
-      },
-      {
-        optionDescription: answerD,
-        isAnswer: false,
-      },
-    ];
-
-    if (selectedAnswer == "A") {
-      answers[0].isAnswer = true;
-    } else if (selectedAnswer == "B") {
-      answers[1].isAnswer = true;
-    } else if (selectedAnswer == "C") {
-      answers[2].isAnswer = true;
-    } else if (selectedAnswer == "D") {
-      answers[3].isAnswer = true;
+      const createQuizDetailData = {
+        questionDescription: question,
+        options: answers,
+      };
+      createQuizDetail({
+        variables: {
+          createQuizDetailData: createQuizDetailData,
+          quizId: createQuiz.id,
+        },
+      });
     }
-
-    const createQuizDetailData = {
-      questionDescription: question,
-      options: answers,
-    };
-    createQuizDetail({
-      variables: {
-        createQuizDetailData: createQuizDetailData,
-        quizId: createQuiz.id,
-      },
-    });
   };
 
   const updateAnswer = (str) => {
@@ -471,11 +482,20 @@ export default function NewQuizPage() {
                 </div>
                 <div className="flex content-center mt-6 w-full h-full mx-auto px-4 sm:px-6 md:px-8">
                   {/* Replace with your content */}
-
                   <div className="flex flex-col content-center sm:justify-center pt-4 overflow-y-scroll overflow-x-hidden rounded-lg shadow-xl bg-indigo-600 h-5/6 w-full sm:pt-2 sm:pt-10">
+                    {alertMessage != "" ? (
+                      <AlertModal
+                        key={alertMessage}
+                        successMsg={alertMessage}
+                        type={alertType}
+                        dismiss={(e) => setAlertMessage(e)}
+                      />
+                    ) : (
+                      <div></div>
+                    )}
                     <div className="px-4 pt-5 sm:px-6 flex-col sm:flex sm:flex-row justify-between content-center">
                       <div>
-                        <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">
+                        <h3 className="mb-4 font-semibold text-white dark:text-white">
                           Answer
                         </h3>
                         <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white rounded-xl  flex dark:bg-gray-700 dark:text-white shadow-lg">
