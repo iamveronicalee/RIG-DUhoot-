@@ -41,7 +41,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (getLoginResponseRes.data) {
-      const token = getLoginResponseRes.data.login.accessToken
+      const token = getLoginResponseRes.data.login.accessToken;
       setAccessToken(token);
       setCookie("jid", token, {
         path: "/",
