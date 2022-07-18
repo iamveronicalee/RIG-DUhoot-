@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import QuizComponent from "../Component/QuizComponent";
 import NoQuiz from "../Component/NoQuiz";
 import QuizHistoryComponent from "../Component/QuizHistoryComponent";
+import { useCookies } from "react-cookie";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -66,12 +67,14 @@ export default function MyQuiz() {
   const [currentQuizName, setCurrentQuizName] = useState("");
 
   const [quizSession, setQuizSession] = useSessionStorage("quizName", "");
+  const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
 
   useEffect(() => {
     const token = getSessionStorageOrDefault("accessToken", "");
-    if (token == "") {
-      navigate("/auth/login");
-    } else {
+    if (
+      token != "" ||
+      (Object.keys(cookies).length != 0 && cookies.jid != "")
+    ) {
       fetchUser(token);
     }
   }, []);

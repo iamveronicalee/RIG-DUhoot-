@@ -8,6 +8,7 @@ import axios from "axios";
 import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
 import { socket } from "../Code/socket";
 import ErrorAlert from "../Component/ErrorAlert";
+import { useCookies } from "react-cookie";
 
 const GET_USER_BY_USERNAME = gql`
   mutation getUserByUsername($username: String!) {
@@ -32,6 +33,7 @@ export default function HomePage() {
   const [userId, setUserId] = useState(0);
   const navigate = useNavigate();
   const [quizId, setQuizId] = useState(0);
+  const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
 
   useEffect(() => {
     console.log(roomID);
@@ -61,15 +63,6 @@ export default function HomePage() {
     });
   }, [socket]);
   //END SOCKET
-
-  useEffect(() => {
-    const token = getSessionStorageOrDefault("accessToken", "");
-    if (token == "") {
-      navigate("/auth/login");
-    } else {
-      fetchUser(token);
-    }
-  }, []);
 
   const fetchUser = (token) => {
     axios
