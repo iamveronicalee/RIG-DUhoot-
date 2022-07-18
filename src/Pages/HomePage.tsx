@@ -5,7 +5,10 @@ import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
+import {
+  getSessionStorageOrDefault,
+  useSessionStorage,
+} from "../Utils/useSessionStorage";
 import { socket } from "../Code/socket";
 import ErrorAlert from "../Component/ErrorAlert";
 import { useCookies } from "react-cookie";
@@ -28,39 +31,43 @@ const JOIN_QUIZ = gql`
 export default function HomePage() {
   const [roomID, setRoomID] = useState(0);
   const [userMutate, userMutateRes] = useMutation(GET_USER_BY_USERNAME);
-  const [joinQuizQuery, joinQuizRes] = useMutation(JOIN_QUIZ);
-  const [errorMessage, setErrorMessage] = useState("");
   const [userId, setUserId] = useState(0);
+  // const [joinQuizQuery, joinQuizRes] = useMutation(JOIN_QUIZ);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const navigate = useNavigate();
   const [quizId, setQuizId] = useState(0);
   const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
 
-  useEffect(() => {
-    console.log(roomID);
-  }, [roomID]);
+  // const [quizId, setQuizId] = useState(0);
 
   //SOCKET
   const handleClick = () => {
+    console.log("clicked");
     socket.emit("join_room", { roomId: roomID, participantId: userId });
   };
 
   useEffect(() => {
-    socket.on("join_room_feedback", (data) => {
-      console.log(data);
-      if (data.isSuccess) {
-        //kalau sucess join
-        const roomId = data.roomId;
-        console.log("JOINED ROOM " + roomId);
-
-        //redirect ke page waiting for host
-        navigate("/waiting-host", { state: { roomId } });
-      } else {
-        //kalau ditolak (room ga ada dll.)
-        console.log("JOINED ROOM ERROR");
-        setErrorMessage("Invalid Room!");
-        // munculin error aja di input
-      }
-    });
+    let count = getSessionStorageOrDefault("count", "");
+    if (count == "") {
+      console.log("scoket connected");
+      sessionStorage.setItem("count", "1");
+      socket.on("join_room_feedback", (data) => {
+        console.log(data);
+        if (data.isSuccess) {
+          //kalau sucess join
+          const roomId = data.roomId;
+          console.log("JOINED ROOM " + roomId);
+          //redirect ke page waiting for host
+          navigate("/waiting-host", { state: { roomId } });
+        } else {
+          //kalau ditolak (room ga ada dll.)
+          console.log("JOINED ROOM ERROR");
+          setErrorMessage("Invalid Room!");
+          // munculin error aja di input
+        }
+      });
+    }
   }, [socket]);
   //END SOCKET
 

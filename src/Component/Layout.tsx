@@ -86,6 +86,7 @@ export default function Layout(props, { children }) {
   const [disableCreateQuiz, setDisableCreateQuiz] = useState(true);
   const [user, setUser] = useState("");
   const [username, setUsername] = useState("");
+  const [count, setCount] = useSessionStorage("count", "");
   const [accessToken, setAccessToken] = useSessionStorage("accessToken", "");
   const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
 

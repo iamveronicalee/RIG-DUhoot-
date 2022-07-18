@@ -1,13 +1,64 @@
+import { useMutation } from "@apollo/client";
+import axios from "axios";
+import gql from "graphql-tag";
 import React, { useEffect, useState } from "react";
 import ReactLoading from "react-loading";
 import { useLocation, useNavigate } from "react-router-dom";
 import { socket } from "../Code/socket";
+import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
 import StellarBackground from "./StellarBackground";
 
+const GET_USER_BY_USERNAME = gql`
+  mutation getUserByUsername($username: String!) {
+    getUserByUsername(username: $username) {
+      id
+      userName
+      userId
+    }
+  }
+`;
+
 export default function WaitingHost() {
+  const [userMutate, userMutateRes] = useMutation(GET_USER_BY_USERNAME);
+  const [userId, setUserId] = useState(0);
+  const [userName, setUserName] = useState("");
   const { state } = useLocation();
   const { roomId } = state;
   const navigate = useNavigate();
+  var location = "1";
+
+  useEffect(() => {
+    const token = getSessionStorageOrDefault("accessToken", "");
+    if (token == "") {
+      navigate("/auth/login");
+    } else {
+      fetchUser(token);
+    }
+  }, []);
+
+  const fetchUser = (token) => {
+    axios
+      .get("http://localhost:9000/auth/user", {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        userMutate({
+          variables: {
+            username: response.data.username,
+          },
+        });
+      });
+  };
+
+  useEffect(() => {
+    if (userMutateRes.data != undefined) {
+      console.log(userMutateRes.data.getUserByUsername);
+      setUserId(userMutateRes.data.getUserByUsername.userName);
+      setUserName(userMutateRes.data.getUserByUsername.userName);
+    }
+  }, [userMutateRes.data]);
 
   useEffect(() => {
     if (location == null) {
@@ -15,15 +66,18 @@ export default function WaitingHost() {
     }
   }, [location]);
 
-  const leaveRoom = () => {
-    socket.emit("leave_room", { roomId: roomId });
+  const leaveRoom = (userName) => {
+    console.log(roomId);
+    console.log(userName);
+    socket.emit("leave_room", { roomId: roomId, participantId: userName });
+    navigate("/");
   };
 
   useEffect(() => {
     window.addEventListener("popstate", function (event) {
-      leaveRoom();
+      leaveRoom(userName);
     });
-  }, []);
+  }, [userName]);
 
   //SOCKET
 
