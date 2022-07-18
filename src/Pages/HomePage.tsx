@@ -5,6 +5,10 @@ import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
+import { socket } from "../Code/socket";
+import ErrorAlert from "../Component/ErrorAlert";
+
 const GET_USER_BY_USERNAME = gql`
   mutation getUserByUsername($username: String!) {
     getUserByUsername(username: $username) {
@@ -21,17 +25,51 @@ const JOIN_QUIZ = gql`
 `;
 
 export default function HomePage() {
-  const [roomID, setRoomID] = useState("");
+  const [roomID, setRoomID] = useState(0);
+  const [userMutate, userMutateRes] = useMutation(GET_USER_BY_USERNAME);
+  const [joinQuizQuery, joinQuizRes] = useMutation(JOIN_QUIZ);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [userId, setUserId] = useState(0);
+  const navigate = useNavigate();
+  const [quizId, setQuizId] = useState(0);
 
   useEffect(() => {
     console.log(roomID);
   }, [roomID]);
 
-  const [userMutate, userMutateRes] = useMutation(GET_USER_BY_USERNAME);
-  const [joinQuizQuery, joinQuizRes] = useMutation(JOIN_QUIZ);
-  const [userId, setUserId] = useState(0);
-  const navigate = useNavigate();
-  const [quizId, setQuizId] = useState(0);
+  //SOCKET
+  const handleClick = () => {
+    socket.emit("join_room", { roomId: roomID, participantId: userId });
+  };
+
+  useEffect(() => {
+    socket.on("join_room_feedback", (data) => {
+      console.log(data);
+      if (data.isSuccess) {
+        //kalau sucess join
+        const roomId = data.roomId;
+        console.log("JOINED ROOM " + roomId);
+
+        //redirect ke page waiting for host
+        navigate("/waiting-host", { state: { roomId } });
+      } else {
+        //kalau ditolak (room ga ada dll.)
+        console.log("JOINED ROOM ERROR");
+        setErrorMessage("Invalid Room!");
+        // munculin error aja di input
+      }
+    });
+  }, [socket]);
+  //END SOCKET
+
+  useEffect(() => {
+    const token = getSessionStorageOrDefault("accessToken", "");
+    if (token == "") {
+      navigate("/auth/login");
+    } else {
+      fetchUser(token);
+    }
+  }, []);
 
   const fetchUser = (token) => {
     axios
@@ -51,8 +89,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (userMutateRes.data != undefined) {
-      console.log(userMutateRes.data.getUserByUsername.id);
-      setUserId(userMutateRes.data.getUserByUsername.id);
+      setUserId(userMutateRes.data.getUserByUsername.userName);
     }
   }, [userMutateRes.data]);
 
@@ -89,8 +126,17 @@ export default function HomePage() {
                     Join Quiz
                   </h2>
                 </div>
-                <form className="mt-8 space-y-6" action="#" method="POST">
+                <form className="mt-8 space-y-6" method="POST">
                   <input type="hidden" name="remember" defaultValue="true" />
+                  {errorMessage !== "" ? (
+                    <ErrorAlert
+                      key=""
+                      errorMsg={errorMessage}
+                      dismiss={(e) => setErrorMessage(e)}
+                    />
+                  ) : (
+                    <div></div>
+                  )}
                   <div className="rounded-md shadow-sm -space-y-px">
                     <div>
                       <label htmlFor="quiz-code" className="sr-only">
@@ -103,16 +149,15 @@ export default function HomePage() {
                         required
                         className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-md font-bold text-center"
                         placeholder="Enter Quiz Code"
-                        onChange={(e) => setRoomID(e.target.value)}
+                        onChange={(e) => setRoomID(parseInt(e.target.value))}
                       />
                     </div>
                   </div>
-
                   <div>
                     <button
-                      type="submit"
+                      type="button"
                       className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      // onClick={() => joinQuiz(event)}
+                      onClick={() => handleClick()}
                     >
                       <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                         <LinkIcon

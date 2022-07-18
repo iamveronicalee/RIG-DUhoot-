@@ -13,10 +13,16 @@ import {
   QrcodeIcon,
 } from "@heroicons/react/outline";
 import { gql } from "apollo-boost";
+import axios from "axios";
 import { create } from "domain";
 import React, { Fragment, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { socket } from "../Code/socket";
 import Layout from "../Component/Layout";
+import {
+  getSessionStorageOrDefault,
+  useSessionStorage,
+} from "../Utils/useSessionStorage";
 
 const CREATE_QUIZ_DETAIL = gql`
   mutation CreateQuizDetail(
@@ -67,8 +73,35 @@ const UPDATE_QUIZ_QUESTION = gql`
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-
 export default function QuizComponent({ quizId, quizName }) {
+  const navigate = useNavigate();
+  const [user, setUser] = useState("");
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    const token = getSessionStorageOrDefault("accessToken", "");
+    if (token == "") {
+      navigate("/auth/login");
+    } else {
+      fetchUser(token);
+    }
+  }, []);
+
+  const fetchUser = (token) => {
+    axios
+      .get("http://localhost:9000/auth/user", {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        // console.log(response.data)
+        // console.log(response.data.realname)
+        setUsername(response.data.realname);
+        setUser(response.data.username);
+      });
+  };
+
   // Data yang di pass
 
   const [createQuizDetail, createQuizDetailRes] =
@@ -98,6 +131,46 @@ export default function QuizComponent({ quizId, quizName }) {
   const [answerC, setAnswerC] = useState("");
   const [answerD, setAnswerD] = useState("");
   const [selectedAnswer, setSelectedAnswer] = useState("");
+  //SOCKET
+
+  const generateRoomId = () => {
+    return Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+  };
+
+  const createRoom = () => {
+    //generate RoomId
+    const ROOM_ID = generateRoomId();
+    socket.emit("create_room", {
+      roomId: ROOM_ID,
+      hostId: user,
+      isStarted: false,
+    });
+  };
+
+  useEffect(() => {
+    socket.on("create_room_feedback", (data) => {
+      if (data) {
+        let quizFinalName = getSessionStorageOrDefault("quizName", "");
+        //kalau room dah dibuat host bakal kemana
+        console.log("CREATE ROOM SUCCESS");
+        navigate("/quiz-participants", {
+          state: { quizName: quizFinalName, roomId: data.roomId },
+        });
+      } else {
+        //kalau gagal buat room.
+        console.log("CREATE ROOM ERROR");
+      }
+    });
+
+    socket.on("room_exist", (data) => {
+      if (data) {
+        console.log("ROOM ID USED...");
+        console.log("GENERATING NEW ROOM...");
+        createRoom();
+      }
+    });
+  }, [socket]);
+  //ENDSOCKET
 
   useEffect(() => {
     if (getQuizDataRes.data) {
@@ -466,11 +539,12 @@ export default function QuizComponent({ quizId, quizName }) {
                 {quizName} Quiz
               </h1>
               <button
-                  type="button"
-                  className="justify-end items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ml-4"
-                >
-                  Start
-                </button>
+                type="button"
+                className="justify-end items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ml-4"
+                onClick={() => createRoom()}
+              >
+                Start
+              </button>
             </div>
             <div className="flex content-center mt-6 w-full h-full mx-auto px-4 sm:px-6 md:px-8">
               {/* Replace with your content */}

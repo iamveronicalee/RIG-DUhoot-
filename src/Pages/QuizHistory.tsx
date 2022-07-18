@@ -7,17 +7,24 @@ import { useMutation } from "@apollo/react-hooks";
 import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import NoQuiz from "../Component/NoQuiz";
+import QuizHistoryComponent from "../Component/QuizHistoryComponent";
 
 const GET_ALL_QUIZ_HISTORY = gql`
   mutation GetAllQuizParticipant($userId: Float!) {
     getAllQuizParticipant(userId: $userId) {
-      id
-      score
       quizConnection {
         quizName
         isStart
         isFinished
         id
+        quizParticipantConnection {
+          quizId
+          score
+          participantConnection {
+            userName
+          }
+        }
       }
     }
   }
@@ -39,10 +46,13 @@ function classNames(...classes) {
 
 export default function QuizHistory() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [quizClicked, setQuizClicked] = useState(false);
   const [quizHistory, quizHistoryRes] = useMutation(GET_ALL_QUIZ_HISTORY);
   const [userMutate, userMutateRes] = useMutation(GET_USER_BY_USERNAME);
   const [userId, setUserId] = useState(0);
   const [navigation, setNavigation] = useState<any[]>([]);
+  const [historyComponent, setHistoryComponent] = useState<any[]>([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,7 +82,7 @@ export default function QuizHistory() {
 
   useEffect(() => {
     if (userMutateRes.data != undefined) {
-      console.log(userMutateRes.data.getUserByUsername.id);
+      // console.log(userMutateRes.data.getUserByUsername.id);
       setUserId(userMutateRes.data.getUserByUsername.id);
     }
   }, [userMutateRes.data]);
@@ -95,6 +105,7 @@ export default function QuizHistory() {
           let check =
             quizHistoryRes.data.getAllQuizParticipant[i].quizConnection
               .isFinished;
+          // console.log(check)
           if (check == true) {
             let quizName =
               quizHistoryRes.data.getAllQuizParticipant[i].quizConnection
@@ -103,20 +114,31 @@ export default function QuizHistory() {
               quizName = quizName.substring(0, 10);
               quizName += "...";
             }
-
+            let personScoreArr =
+              quizHistoryRes.data.getAllQuizParticipant[i].quizConnection
+                .quizParticipantConnection;
+            // console.log(personScoreArr);
             let nav = {
               name: quizName,
               href: "#",
               current: false,
               quizId:
                 quizHistoryRes.data.getAllQuizParticipant[i].quizConnection.id,
+              personScoreArr: personScoreArr,
             };
+
             setNavigation((navigation) => [...navigation, nav]);
           }
         }
       }
     }
   }, [quizHistoryRes.data]);
+
+  const quizBubbleClicked = (obj) => {
+    setQuizClicked(false);
+    setHistoryComponent(obj);
+    setQuizClicked(true);
+  };
 
   return (
     <>
@@ -178,13 +200,13 @@ export default function QuizHistory() {
                       {navigation.map((item) => (
                         <a
                           key={item.name}
-                          href={item.href}
                           className={classNames(
                             item.current
                               ? "bg-indigo-100 text-indigo-900"
                               : "text-indigo-600 hover:bg-indigo-50 hover:text-indigo-900",
                             "group flex items-center px-2 py-2 text-base font-medium rounded-md"
                           )}
+                          onClick={() => quizBubbleClicked(item.personScoreArr)}
                         >
                           {item.name}
                         </a>
@@ -206,20 +228,26 @@ export default function QuizHistory() {
               <div className="flex flex-col h-0 flex-1 border-r border-gray-200">
                 <div className="flex-1 flex flex-col pt-5 pb-4 mostly-customized-scrollbar overflow-y-auto bg-indigo-800">
                   <nav className="mt-5 flex-1 justify-center px-2 space-y-1 text-center bg-indigo-800">
-                    {navigation.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className="flex justify-center"
-                      >
-                        <button
-                          type="button"
-                          className="flex items-center px-5 py-3 m-2 my-4 border border-transparent text-base font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full "
+                    {navigation.length > 0 ? (
+                      navigation.map((item) => (
+                        <a
+                          key={item.name}
+                          className="flex justify-center"
+                          onClick={() => quizBubbleClicked(item.personScoreArr)}
                         >
-                          {item.name}
-                        </button>
-                      </a>
-                    ))}
+                          <button
+                            type="button"
+                            className="flex items-center px-5 py-3 m-2 my-4 border border-transparent text-base font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full "
+                          >
+                            {item.name}
+                          </button>
+                        </a>
+                      ))
+                    ) : (
+                      <h1 className="text-white text-2xl font-bold mt-64">
+                        No Quiz History Yet...
+                      </h1>
+                    )}
                   </nav>
                 </div>
               </div>
@@ -237,21 +265,12 @@ export default function QuizHistory() {
                 <h1 className="w-full">Select a Quiz</h1>
               </button>
             </div>
-            <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
-              <div className="py-6">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                  <h1 className="text-2xl font-semibold text-gray-900">
-                    No Quiz Selected Yet...
-                  </h1>
-                </div>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                  {/* Replace with your content */}
-                  <div className="py-4">
-                    <div className="border-4 border-dashed border-gray-200 rounded-lg h-96" />
-                  </div>
-                  {/* /End replace */}
-                </div>
-              </div>
+            <main className="flex-1 relative z-10 overflow-y-auto focus:outline-none bg-indigo-800">
+              {quizClicked ? (
+                <QuizHistoryComponent objectArr={historyComponent} />
+              ) : (
+                <NoQuiz />
+              )}
             </main>
           </div>
         </div>

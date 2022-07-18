@@ -8,13 +8,18 @@ import NewQuizPage from "./Pages/NewQuizPage";
 import MyQuiz from "./Pages/MyQuiz";
 import QuizHistory from "./Pages/QuizHistory";
 import JoinQuizPage from "./Pages/JoinQuizPage";
-import TestSocket from "./Pages/TestSocket";
+import QuizParticipantPage from "./Pages/QuizParticipantPage";
+import WaitingHost from "./Component/WaitingHost";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/test-socket" element={<TestSocket />}></Route>
+        <Route path="/waiting-host" element={<WaitingHost />}></Route>
+        <Route
+          path="/quiz-participants"
+          element={<QuizParticipantPage />}
+        ></Route>
         <Route path="/quiz" element={<JoinQuizPage />}></Route>
         <Route path="/create-quiz" element={<NewQuizPage />}></Route>
         <Route path="/" element={<HomePage />}></Route>

@@ -1,8 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactLoading from "react-loading";
+import { useLocation, useNavigate } from "react-router-dom";
+import { socket } from "../Code/socket";
 import StellarBackground from "./StellarBackground";
 
 export default function WaitingHost() {
+  const { state } = useLocation();
+  const { roomId } = state;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location == null) {
+      navigate("/");
+    }
+  }, [location]);
+
+  const leaveRoom = () => {
+    socket.emit("leave_room", { roomId: roomId });
+  };
+
+  useEffect(() => {
+    window.addEventListener("popstate", function (event) {
+      leaveRoom();
+    });
+  }, []);
+
+  //SOCKET
+
+  useEffect(() => {
+    socket.on("leave_room", (data) => {
+      //emit ke socket untuk keluarin user ini dari ruangan
+      if (data) {
+        console.log("left room");
+        leaveRoom();
+      }
+    });
+  }, [socket]);
+  //ENDSOCKET
+
   return (
     <div className="h-screen flex content-center justify-center overflow-hidden bg-indigo-900">
       <StellarBackground />

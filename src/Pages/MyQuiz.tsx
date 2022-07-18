@@ -1,13 +1,19 @@
 import { Transition, Dialog, Menu } from "@headlessui/react";
 import { XIcon, MenuIcon } from "@heroicons/react/outline";
 import React, { Fragment, useEffect, useState } from "react";
+
 import Layout from "../Component/Layout";
 import { gql } from "apollo-boost";
 import { useMutation } from "@apollo/react-hooks";
 import axios from "axios";
-import { getSessionStorageOrDefault } from "../Utils/useSessionStorage";
+import {
+  getSessionStorageOrDefault,
+  useSessionStorage,
+} from "../Utils/useSessionStorage";
 import { useNavigate } from "react-router-dom";
 import QuizComponent from "../Component/QuizComponent";
+import NoQuiz from "../Component/NoQuiz";
+import QuizHistoryComponent from "../Component/QuizHistoryComponent";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -23,6 +29,12 @@ const GET_PERSON_QUIZ_LIST = gql`
       creatorId
       isStart
       isFinished
+      quizParticipantConnection {
+        score
+        participantConnection {
+          userName
+        }
+      }
     }
   }
 `;
@@ -40,15 +52,29 @@ const GET_USER_BY_USERNAME = gql`
 export default function MyQuiz() {
   const [isQuizClicked, setIsQuizClicked] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDoneClicked, setIsDoneClicked] = useState(false);
+  const [userScoreList, setUserScoreList] = useState<any[]>([]);
   const [navigation, setNavigation] = useState<any[]>([]);
   const [doneQuiz, setDoneQuiz] = useState<any[]>([]);
-  const [onGoingQuiz, setOnGoingQuiz] = useState<any[]>([]);
+  const [historyComponent, setHistoryComponent] = useState<any[]>([]);
+
   const [userQuiz, userQuizRes] = useMutation(GET_PERSON_QUIZ_LIST);
   const [userMutate, userMutateRes] = useMutation(GET_USER_BY_USERNAME);
   const [userId, setUserId] = useState(0);
   const navigate = useNavigate();
   const [currentQuizId, setCurrentQuizId] = useState(0);
   const [currentQuizName, setCurrentQuizName] = useState("");
+
+  const [quizSession, setQuizSession] = useSessionStorage("quizName", "");
+
+  useEffect(() => {
+    const token = getSessionStorageOrDefault("accessToken", "");
+    if (token == "") {
+      navigate("/auth/login");
+    } else {
+      fetchUser(token);
+    }
+  }, []);
 
   const fetchUser = (token) => {
     axios
@@ -68,7 +94,6 @@ export default function MyQuiz() {
 
   useEffect(() => {
     if (userMutateRes.data != undefined) {
-      console.log(userMutateRes.data.getUserByUsername.id);
       setUserId(userMutateRes.data.getUserByUsername.id);
     }
   }, [userMutateRes.data]);
@@ -85,10 +110,8 @@ export default function MyQuiz() {
 
   useEffect(() => {
     if (userQuizRes.data != undefined) {
-      // console.log(userQuizRes.data.getPersonQuizList)
       for (let i = 0; i < userQuizRes.data.getPersonQuizList.length; i++) {
         let quizName = userQuizRes.data.getPersonQuizList[i].quizName;
-        // console.log(quizName + " " + quizName.length)
         if (quizName.length >= 10) {
           quizName = quizName.substring(0, 10);
           quizName += "...";
@@ -96,7 +119,6 @@ export default function MyQuiz() {
 
         let isFinished = userQuizRes.data.getPersonQuizList[i].isFinished;
         let isStarted = userQuizRes.data.getPersonQuizList[i].isStart;
-        // console.log(isStart)
         let nav = {
           name: quizName,
           href: "#",
@@ -107,17 +129,42 @@ export default function MyQuiz() {
         if (isFinished == false) {
           setNavigation((navigation) => [...navigation, nav]);
         } else {
-          setDoneQuiz((doneQuiz) => [...doneQuiz, nav]);
+          let personScoreArr =
+            userQuizRes.data.getPersonQuizList[i].quizParticipantConnection;
+          let obj = {
+            name: quizName,
+            href: "#",
+            current: false,
+            quizId: userQuizRes.data.getPersonQuizList[i].id,
+            personScoreArr: personScoreArr,
+          };
+
+          setDoneQuiz((doneQuiz) => [...doneQuiz, obj]);
         }
       }
     }
   }, [userQuizRes.data]);
 
+  const clearContent = () => {
+    let content = document.getElementById("quizList");
+    if (content != null) content.innerHTML = "";
+  };
+
   const quizClicked = (quizId, quizName) => {
+    setQuizSession(quizName);
     setIsQuizClicked(false);
+    setIsDoneClicked(false);
     setCurrentQuizId(quizId);
     setCurrentQuizName(quizName);
     setIsQuizClicked(true);
+  };
+
+  const doneQuizClicked = (obj) => {
+    clearContent();
+    setIsQuizClicked(false);
+    setIsDoneClicked(false);
+    setHistoryComponent(obj);
+    setIsDoneClicked(true);
   };
 
   return (
@@ -177,37 +224,48 @@ export default function MyQuiz() {
                   </Transition.Child>
                   <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
                     <nav className="mt-5 px-2 space-y-1">
-                      {navigation.map((item) => (
-                        <a
-                          key={item.name}
-                          href={item.href}
-                          className={classNames(
-                            item.current
-                              ? "bg-green-100 text-green-900"
-                              : "text-green-600 hover:bg-green-50 hover:text-green-900",
-                            "group flex items-center px-2 py-2 text-base font-medium rounded-md font-bold"
-                          )}
-                          onClick={() => quizClicked(item.quizId, item.name)}
-                        >
-                          {item.name}
-                        </a>
-                      ))}
+                      {navigation.length > 0 ? (
+                        navigation.map((item) => (
+                          <a
+                            key={item.name}
+                            className={classNames(
+                              item.current
+                                ? "bg-green-100 text-green-900"
+                                : "text-green-600 hover:bg-green-50 hover:text-green-900",
+                              "group flex items-center px-2 py-2 text-base font-medium rounded-md font-bold"
+                            )}
+                            onClick={() => quizClicked(item.quizId, item.name)}
+                          >
+                            {item.name}
+                          </a>
+                        ))
+                      ) : (
+                        <h1 className="text-white text-2xl font-bold">
+                          No Unfinished Quiz Yet...
+                        </h1>
+                      )}
                     </nav>
                     <nav className="mt-5 px-2 space-y-1">
-                      {doneQuiz.map((item) => (
-                        <a
-                          key={item.name}
-                          href={item.href}
-                          className={classNames(
-                            item.current
-                              ? "bg-red-100 text-red-900"
-                              : "text-red-600 hover:bg-red-50 hover:text-red-900",
-                            "group flex items-center px-2 py-2 text-base font-medium rounded-md font-bold"
-                          )}
-                        >
-                          {item.name}
-                        </a>
-                      ))}
+                      {doneQuiz.length > 0 ? (
+                        doneQuiz.map((item) => (
+                          <a
+                            key={item.name}
+                            className={classNames(
+                              item.current
+                                ? "bg-red-100 text-red-900"
+                                : "text-red-600 hover:bg-red-50 hover:text-red-900",
+                              "group flex items-center px-2 py-2 text-base font-medium rounded-md font-bold"
+                            )}
+                            onClick={() => doneQuizClicked(item.personScoreArr)}
+                          >
+                            {item.name}
+                          </a>
+                        ))
+                      ) : (
+                        <h1 className="text-white text-2xl font-bold">
+                          No Finished Quiz Yet...
+                        </h1>
+                      )}
                     </nav>
                   </div>
                 </div>
@@ -228,21 +286,26 @@ export default function MyQuiz() {
                     Unstarted Quiz
                   </h1>
                   <nav className="mt-5 flex-1 justify-center px-2 space-y-1 text-center bg-indigo-800">
-                    {navigation.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className="flex justify-center"
-                        onClick={() => quizClicked(item.quizId, item.name)}
-                      >
-                        <button
-                          type="button"
-                          className="flex items-center px-5 py-3 m-2 my-4 border border-transparent text-base font-medium rounded shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 w-full "
+                    {navigation.length > 0 ? (
+                      navigation.map((item) => (
+                        <a
+                          key={item.name}
+                          className="flex justify-center"
+                          onClick={() => quizClicked(item.quizId, item.name)}
                         >
-                          {item.name}
-                        </button>
-                      </a>
-                    ))}
+                          <button
+                            type="button"
+                            className="flex items-center px-5 py-3 m-2 my-4 border border-transparent text-base font-medium rounded shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 w-full "
+                          >
+                            {item.name}
+                          </button>
+                        </a>
+                      ))
+                    ) : (
+                      <h1 className="text-white text-2xl font-bold mt-20">
+                        No Unfinished Quiz Yet...
+                      </h1>
+                    )}
                   </nav>
                 </div>
 
@@ -251,20 +314,26 @@ export default function MyQuiz() {
                     Finished Quiz
                   </h1>
                   <nav className="mt-5 flex-1 justify-center px-2 space-y-1 text-center bg-indigo-800">
-                    {doneQuiz.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className="flex justify-center"
-                      >
-                        <button
-                          type="button"
-                          className="flex items-center px-5 py-3 m-2 my-4 border border-transparent text-base font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 w-full "
+                    {doneQuiz.length > 0 ? (
+                      doneQuiz.map((item) => (
+                        <a
+                          key={item.name}
+                          className="flex justify-center"
+                          onClick={() => doneQuizClicked(item.personScoreArr)}
                         >
-                          {item.name}
-                        </button>
-                      </a>
-                    ))}
+                          <button
+                            type="button"
+                            className="flex items-center px-5 py-3 m-2 my-4 border border-transparent text-base font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 w-full "
+                          >
+                            {item.name}
+                          </button>
+                        </a>
+                      ))
+                    ) : (
+                      <h1 className="text-white text-2xl font-bold mt-20">
+                        No Finished Quiz Yet...
+                      </h1>
+                    )}
                   </nav>
                 </div>
               </div>
@@ -283,15 +352,17 @@ export default function MyQuiz() {
               </button>
             </div>
 
-            <main className="flex-1 z-0 focus:outline-none">
-              <div className="">
+            <main className="flex-1 z-0 focus:outline-none bg-indigo-800">
+              <div className="" id="quizList">
                 {isQuizClicked ? (
                   <QuizComponent
                     quizId={currentQuizId}
                     quizName={currentQuizName}
                   />
+                ) : isDoneClicked ? (
+                  <QuizHistoryComponent objectArr={historyComponent} />
                 ) : (
-                  <div>hehe</div>
+                  <NoQuiz />
                 )}
               </div>
             </main>
