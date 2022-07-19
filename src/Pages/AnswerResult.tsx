@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import StellarBackground from "../Component/StellarBackground";
 import { Navigate, useLocation, useNavigate } from "react-router";
-import { Socket } from "socket.io-client";
 import { socket } from "../Code/socket";
 
 const incorrects = ["Oops ", "Sorry ", "Oh no "];
@@ -17,13 +16,15 @@ export default function AnswerResult() {
   const location = state;
 
   const navigate = useNavigate();
-  const [result, setResult] = useState(true);
+  const [result, setResult] = useState(false);
   const [prefix, setPrefix] = useState("");
 
   useEffect(() => {
 
 
     if (location.isTrue == "true") {
+
+      // loading.roomId
       setResult(true)
       setPrefix(corrects[genrateRandomNumber(0, corrects.length - 1)]);
     } else {
@@ -36,9 +37,15 @@ export default function AnswerResult() {
   useEffect(()=>{
 
     socket.on("start-question", (data)=>{
+      alert('masuk')
       navigate("/answer-quiz", {
         state: {quizId: data.quizId, questions: data.question },
       })
+    })
+
+
+    socket.on("question_end", ()=>{
+      navigate("/");
     })
 
   }, [socket])

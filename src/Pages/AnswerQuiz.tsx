@@ -20,6 +20,7 @@ export default function AnswerQuiz() {
   useEffect(() => {
     // console.log(location)
     if (location != undefined) {
+      console.log(location)
       const answers = location.questions.answers;
       setQuestion(location.questions.question);
       setAnswerA(answers[0].optionDescription);
@@ -51,10 +52,11 @@ export default function AnswerQuiz() {
 
   useEffect(()=>{
     socket.on("redirect_loading", (data)=>{
-      if (data){
+      if (data.roomId != undefined){
         navigate("/loading-page", {
           state : {
-            isTrue : sessionStorage.getItem("isCorrect")
+            isTrue : sessionStorage.getItem("isCorrect"),
+            roomId : data.roomId 
           }
         })
       }
@@ -64,6 +66,7 @@ export default function AnswerQuiz() {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
+    sessionStorage.setItem("isCorrect", "false");
     setSeconds(15);
   }, []);
 

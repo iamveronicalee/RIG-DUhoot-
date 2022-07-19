@@ -92,8 +92,9 @@ export default function WaitingHost() {
     });
 
     socket.on("start_question", (data) =>{
+      console.log(data)
       navigate("/answer-quiz", {
-        state: { roomId: roomId, quizId: data.quizId, questions: data.question },
+        state: {quizId: data.quizId, questions: data.question },
       });
     })
 
