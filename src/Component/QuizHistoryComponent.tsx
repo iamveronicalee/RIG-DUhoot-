@@ -9,7 +9,8 @@ function classNames(...classes) {
 export default function QuizHistoryComponent({ objectArr }) {
   const [userScoreList, setUserScoreList] = useState<any[]>([]);
 
-  const loadData = () => {
+  async function loadData(){
+    setUserScoreList(userScoreList => []);
     for (let i = 0; i < objectArr.length; i++) {
       let bgColor = "bg-red-600";
       let score = objectArr[i].score;
@@ -29,18 +30,9 @@ export default function QuizHistoryComponent({ objectArr }) {
     }
   };
 
-  const clearContent = () => {
-    let content = document.getElementById("list");
-    if (content != null) {
-      content.innerHTML = "";
-    }
-  };
-
   useEffect(() => {
-    clearContent();
     loadData();
   }, [objectArr]);
-
   return (
     <>
       <div>

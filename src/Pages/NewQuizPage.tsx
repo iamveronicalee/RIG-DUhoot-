@@ -248,7 +248,6 @@ export default function NewQuizPage() {
 
   useEffect(() => {
     if (createQuizDetailRes.data) {
-      setAlertMessage("Insert");
       const quizData = createQuizDetailRes.data.createQuizDetail;
       const answers = [
         {
@@ -311,7 +310,7 @@ export default function NewQuizPage() {
       selectedAnswer.trim() == ""
     ) {
       setAlertType(false);
-      setAlertMessage("Insert");
+      setAlertMessage("Insert");  
     } else {
       //ambil data
       const answers = [
@@ -353,6 +352,7 @@ export default function NewQuizPage() {
           quizId: createQuiz.id,
         },
       });
+      setAlertMessage("Insert");
     }
   };
 
@@ -483,7 +483,7 @@ export default function NewQuizPage() {
                 <div className="flex content-center mt-6 w-full h-full mx-auto px-4 sm:px-6 md:px-8">
                   {/* Replace with your content */}
                   <div className="flex flex-col content-center sm:justify-center pt-4 overflow-y-scroll overflow-x-hidden rounded-lg shadow-xl bg-indigo-600 h-5/6 w-full sm:pt-2 sm:pt-10">
-                    {alertMessage != "" ? (
+                    { ( (alertMessage != "")) ? (
                       <AlertModal
                         key={alertMessage}
                         successMsg={alertMessage}
@@ -492,7 +492,7 @@ export default function NewQuizPage() {
                       />
                     ) : (
                       <div></div>
-                    )}
+                    )}  
                     <div className="px-4 pt-5 sm:px-6 flex-col sm:flex sm:flex-row justify-between content-center">
                       <div>
                         <h3 className="mb-4 font-semibold text-white dark:text-white">

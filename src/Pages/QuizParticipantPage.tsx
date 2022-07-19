@@ -87,6 +87,16 @@ export default function QuizParticipantPage() {
   }, [socket]);
   //ENDSOCKET
 
+
+  const quizStarted = ()=>{
+    let data = {
+
+    }
+    socket.emit("start_room", {
+
+    })
+  }
+
   return (
     <>
       <StellarBackground />
@@ -122,6 +132,7 @@ export default function QuizParticipantPage() {
           <button
             type="button"
             className="inline-flex w-full sm:w-32 content-center justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            onClick={quizStarted()}
           >
             Start
           </button>
