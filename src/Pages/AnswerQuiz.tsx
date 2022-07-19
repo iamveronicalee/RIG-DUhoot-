@@ -61,6 +61,19 @@ export default function AnswerQuiz() {
     })
   }, [socket])
 
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    setSeconds(15);
+  }, []);
+
+  useEffect(() => {
+    seconds > 0 &&
+      setTimeout(() => {
+        setSeconds(seconds - 1);
+      }, 1000);
+  }, [seconds]);
+
   return (
     <>
       {/* <StellarBackground /> */}
@@ -81,7 +94,7 @@ export default function AnswerQuiz() {
                 <div className="flex flex-col content-center sm:justify-center pt-2 overflow-y-scroll mostly-customized-scrollbar overflow-x-hidden rounded-lg shadow-xl bg-indigo-600 h-5/6 mt-4 w-full sm:pt-2 sm:pt-6">
                   <div className="px-0 h-auto sm:px-0 flex align-center justify-center content-center">
                     <span className="inline-flex justify-center items-center content-center h-14 w-14 rounded-full rounded-full text-xl font-medium bg-gray-100 text-gray-800">
-                      10
+                      {seconds}
                     </span>
                   </div>
                   <div className="px-4 pb-6 sm:py-6 sm:px-6 h-2/5">
