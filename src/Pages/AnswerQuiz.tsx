@@ -1,8 +1,66 @@
 import React, { useEffect, useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router";
 import StellarBackground from "../Component/StellarBackground";
+import { socket } from "../Code/socket";
 
 export default function AnswerQuiz() {
   const [option, setOption] = useState("");
+  const [question, setQuestion] = useState("");
+  const [answerA, setAnswerA] = useState("");
+  const [answerB, setAnswerB] = useState("");
+  const [answerC, setAnswerC] = useState("");
+  const [answerD, setAnswerD] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [isCorrect, setIsCorrect] = useState(false);
+  const navigate = useNavigate();
+  
+  const { state } = useLocation();
+  const location = state;
+
+  useEffect(() => {
+    // console.log(location)
+    if (location != undefined) {
+      const answers = location.questions.answers;
+      setQuestion(location.questions.question);
+      setAnswerA(answers[0].optionDescription);
+      setAnswerB(answers[1].optionDescription);
+      setAnswerC(answers[2].optionDescription);
+      setAnswerD(answers[3].optionDescription);
+
+      if (answers[0].isAnswer == true) {
+        setAnswer("A");
+      } else if (answers[1].isAnswer == true) {
+        setAnswer("B");
+      } else if (answers[2].isAnswer == true) {
+        setAnswer("C");
+      } else if (answers[3].isAnswer == true) {
+        setAnswer("D");
+      }
+    }
+  }, [location]);
+
+  useEffect(()=>{
+    if (option == answer){
+      sessionStorage.setItem("isCorrect", "true");
+    }
+    else{
+      sessionStorage.setItem("isCorrect", "false");
+    }
+  }, [option])
+
+
+  useEffect(()=>{
+    socket.on("redirect_loading", (data)=>{
+      if (data){
+        navigate("/loading-page", {
+          state : {
+            isTrue : sessionStorage.getItem("isCorrect")
+          }
+        })
+      }
+    })
+  }, [socket])
+
   return (
     <>
       {/* <StellarBackground /> */}
@@ -38,7 +96,7 @@ export default function AnswerQuiz() {
                         id="question"
                         className="my-2.5 bg-blue-100 shadow-sm text-center block w-full sm:text-2xl font-bold border-gray-300 rounded-md h-full resize-none"
                       >
-                        Who Is Bimbing ?
+                        {question}
                       </div>
                     </div>
                   </div>
@@ -58,7 +116,7 @@ export default function AnswerQuiz() {
                           type="button"
                           className="inline-block px-6 py-2.5 bg-red-500 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-800 active:shadow-lg transition duration-150 ease-in-out shadow-sm text-center block w-full h-24 sm:text-xl font-bold  border-gray-300 rounded-md resize-none"
                         >
-                          MT NK
+                          {answerA}
                         </button>
                       </div>
                       <div>
@@ -73,7 +131,7 @@ export default function AnswerQuiz() {
                           type="button"
                           className="inline-block px-6 py-2.5 bg-yellow-500 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-yellow-700 hover:shadow-lg focus:bg-yellow-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-yellow-800 active:shadow-lg transition duration-150 ease-in-out shadow-sm text-center block w-full h-24 sm:text-xl font-bold  border-gray-300 rounded-md resize-none"
                         >
-                          MT
+                          {answerB}
                         </button>
                       </div>
                       <div>
@@ -88,7 +146,7 @@ export default function AnswerQuiz() {
                           type="button"
                           className="inline-block px-6 py-2.5 bg-green-500 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-green-700 hover:shadow-lg focus:bg-green-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-800 active:shadow-lg transition duration-150 ease-in-out shadow-sm text-center block w-full h-24 sm:text-xl font-bold  border-gray-300 rounded-md resize-none"
                         >
-                          NK
+                          {answerC}
                         </button>
                       </div>
                       <div>
@@ -103,7 +161,7 @@ export default function AnswerQuiz() {
                           type="button"
                           className="inline-block px-6 py-2.5 bg-blue-500 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out shadow-sm text-center block w-full h-24 sm:text-xl font-bold  border-gray-300 rounded-md resize-none"
                         >
-                          MAV NIKO
+                          {answerD}
                         </button>
                       </div>
                     </div>

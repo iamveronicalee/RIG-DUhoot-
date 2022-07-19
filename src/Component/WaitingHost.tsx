@@ -22,6 +22,7 @@ export default function WaitingHost() {
   const [userMutate, userMutateRes] = useMutation(GET_USER_BY_USERNAME);
   const [userId, setUserId] = useState(0);
   const [userName, setUserName] = useState("");
+  const [quizId, setQuizId] = useState(0);
   const { state } = useLocation();
   const { roomId } = state;
   const navigate = useNavigate();
@@ -86,9 +87,16 @@ export default function WaitingHost() {
       //emit ke socket untuk keluarin user ini dari ruangan
       if (data) {
         console.log("left room");
-        leaveRoom();
+        leaveRoom(userName);
       }
     });
+
+    socket.on("start_question", (data) =>{
+      navigate("/answer-quiz", {
+        state: { roomId: roomId, quizId: data.quizId, questions: data.question },
+      });
+    })
+
   }, [socket]);
   //ENDSOCKET
 

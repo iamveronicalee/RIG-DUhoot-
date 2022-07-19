@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-import StellarBackground from "./StellarBackground";
+import StellarBackground from "../Component/StellarBackground";
+import { Navigate, useLocation, useNavigate } from "react-router";
+import { Socket } from "socket.io-client";
+import { socket } from "../Code/socket";
 
 const incorrects = ["Oops ", "Sorry ", "Oh no "];
 const corrects = ["Yay ", "Congrats ", "Cool "];
@@ -9,16 +12,36 @@ const genrateRandomNumber = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-export default function AnswerResult(props) {
+export default function AnswerResult() {
+  const { state } = useLocation();
+  const location = state;
+
+  const navigate = useNavigate();
   const [result, setResult] = useState(true);
   const [prefix, setPrefix] = useState("");
+
   useEffect(() => {
-    if (result) {
+
+
+    if (location.isTrue == "true") {
+      setResult(true)
       setPrefix(corrects[genrateRandomNumber(0, corrects.length - 1)]);
     } else {
+      setResult(false)
       setPrefix(incorrects[genrateRandomNumber(0, incorrects.length - 1)]);
     }
-  }, []);
+    // console.log(location)
+  }, [location]);
+
+  useEffect(()=>{
+
+    socket.on("start-question", (data)=>{
+      navigate("/answer-quiz", {
+        state: {quizId: data.quizId, questions: data.question },
+      })
+    })
+
+  }, [socket])
 
   return (
     <div className="h-screen flex content-center justify-center overflow-hidden bg-indigo-900">
@@ -41,7 +64,7 @@ export default function AnswerResult(props) {
               />
             </svg>
             <h2 className="inline-flex items-center justify-center px-2.5 pt-5 content-center border border-transparent text-5xl font-medium rounded shadow-sm font-extrabold text-white italic w-full h-full drop-shadow-md lg:text-3xl md:text-5xl text-2xl text-center">
-              {prefix}  Correct Answer
+              {prefix} Correct Answer
             </h2>
           </div>
         ) : (
@@ -61,7 +84,7 @@ export default function AnswerResult(props) {
               />
             </svg>
             <h2 className="inline-flex items-center justify-center px-2.5 pt-5 content-center border border-transparent text-5xl font-medium rounded shadow-sm font-extrabold text-white italic w-full h-full drop-shadow-md lg:text-3xl md:text-5xl text-2xl text-center">
-              {prefix}  Incorrect Answer
+              {prefix} Incorrect Answer
             </h2>
           </div>
         )}

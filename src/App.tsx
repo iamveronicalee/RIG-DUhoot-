@@ -9,18 +9,25 @@ import MyQuiz from "./Pages/MyQuiz";
 import QuizHistory from "./Pages/QuizHistory";
 import QuizParticipantPage from "./Pages/QuizParticipantPage";
 import WaitingHost from "./Component/WaitingHost";
-import QuizComponent from "./Component/QuizComponent";
 import HostQuizPage from "./Pages/HostQuizPage";
+import AnswerQuiz from "./Pages/AnswerQuiz";
+import AnswerResult from "./Pages/AnswerResult";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/waiting-host" element={<WaitingHost />}></Route>
+        <Route path="/loading-page" element={<AnswerResult />}></Route>
         <Route
           path="/quiz-participants"
           element={<QuizParticipantPage />}
         ></Route>
+        <Route
+          path="/answer-quiz"
+          element={<AnswerQuiz/>}
+        >
+        </Route>
         <Route path="/host-quiz" element={<HostQuizPage />}></Route>
         <Route path="/create-quiz" element={<NewQuizPage />}></Route>
         <Route path="/" element={<HomePage />}></Route>

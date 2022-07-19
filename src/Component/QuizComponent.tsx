@@ -393,6 +393,7 @@ export default function QuizComponent({ quizId, quizName }) {
       roomId: ROOM_ID,
       hostId: user,
       isStarted: false,
+      quizId : quizId
     });
   };
 
