@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import QuizComponent from "../Component/QuizComponent";
 import NoQuiz from "../Component/NoQuiz";
 import QuizHistoryComponent from "../Component/QuizHistoryComponent";
-import { useCookies } from "react-cookie";
+// import { useCookies } from "react-cookie";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -67,19 +67,21 @@ export default function MyQuiz() {
   const [currentQuizName, setCurrentQuizName] = useState("");
 
   const [quizSession, setQuizSession] = useSessionStorage("quizName", "");
-  const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
+  // const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
 
   useEffect(() => {
     const token = getSessionStorageOrDefault("accessToken", "");
     if (
-      token != "" ||
-      (Object.keys(cookies).length != 0 && cookies.jid != "")
+      token != ""
+      // ||
+      // (Object.keys(cookies).length != 0 && cookies.jid != "")
     ) {
       fetchUser(token);
     }
   }, []);
 
   const fetchUser = (token) => {
+    // console.log("fetchuser", token);
     axios
       .get("http://localhost:9000/auth/user", {
         headers: {
@@ -87,9 +89,10 @@ export default function MyQuiz() {
         },
       })
       .then((response) => {
+        // console.log("then Response", response.data.user.userName);
         userMutate({
           variables: {
-            username: response.data.username,
+            username: response.data.user.userName,
           },
         });
       });
@@ -121,7 +124,7 @@ export default function MyQuiz() {
         }
 
         let isFinished = userQuizRes.data.getPersonQuizList[i].isFinished;
-        
+
         let nav = {
           name: quizName,
           href: "#",

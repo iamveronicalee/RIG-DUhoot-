@@ -97,8 +97,8 @@ export default function QuizComponent({ quizId, quizName }) {
       .then((response) => {
         // console.log(response.data)
         // console.log(response.data.realname)
-        setUsername(response.data.realname);
-        setUser(response.data.username);
+        setUsername(response.data.user.realName);
+        setUser(response.data.user.userName);
       });
   };
 

@@ -18,7 +18,7 @@ import {
   useSessionStorage,
 } from "../Utils/useSessionStorage";
 import { useNavigate } from "react-router-dom";
-import { Cookies, useCookies } from "react-cookie";
+// import { Cookies, useCookies } from "react-cookie";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -88,7 +88,7 @@ export default function Layout(props, { children }) {
   const [username, setUsername] = useState("");
   const [count, setCount] = useSessionStorage("count", "");
   const [accessToken, setAccessToken] = useSessionStorage("accessToken", "");
-  const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
+  // const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
 
   const navigate = useNavigate();
   const createNewQuizButtonRef = useRef();
@@ -104,7 +104,7 @@ export default function Layout(props, { children }) {
     } else {
       if (token != "") {
         fetchUser(token);
-      } 
+      }
     }
   }, []);
 
@@ -122,7 +122,7 @@ export default function Layout(props, { children }) {
         },
       })
       .then((response) => {
-        setUsername(response.data.userName);
+        setUsername(response.data.user.userName);
         setUser(response.data.user.userName);
       });
   };

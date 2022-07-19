@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import ErrorAlert from "../Component/ErrorAlert";
 import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
-import { useCookies } from "react-cookie";
+// import { useCookies } from "react-cookie";
 
 const LOGIN_RESPONSE = gql`
   mutation Mutation($userName: String!) {
@@ -34,7 +34,7 @@ export default function LoginPage() {
     if (token != "") {
       navigate("/");
     }
-  }, []);
+  }, [accessToken]);
 
   function loginResponse() {
     getLoginResponse({
@@ -44,10 +44,10 @@ export default function LoginPage() {
     });
   }
 
-  
   useEffect(() => {
     if (getLoginResponseRes.data) {
       const token = getLoginResponseRes.data.login.accessToken;
+      // sessionStorage.setItem("accessToken", token);
       setAccessToken(token);
       // setCookie("jid", token, {
       //   path: "/",

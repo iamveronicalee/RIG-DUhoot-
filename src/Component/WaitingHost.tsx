@@ -46,7 +46,7 @@ export default function WaitingHost() {
       .then((response) => {
         userMutate({
           variables: {
-            username: response.data.username,
+            username: response.data.user.userName,
           },
         });
       });

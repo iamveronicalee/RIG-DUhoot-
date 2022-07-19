@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import NoQuiz from "../Component/NoQuiz";
 import QuizHistoryComponent from "../Component/QuizHistoryComponent";
-import { useCookies } from "react-cookie";
+// import { useCookies } from "react-cookie";
 
 const GET_ALL_QUIZ_HISTORY = gql`
   mutation GetAllQuizParticipant($userId: Float!) {
@@ -53,14 +53,15 @@ export default function QuizHistory() {
   const [userId, setUserId] = useState(0);
   const [navigation, setNavigation] = useState<any[]>([]);
   const [historyComponent, setHistoryComponent] = useState<any[]>([]);
-  const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
+  // const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
 
   const navigate = useNavigate();
   useEffect(() => {
     const token = getSessionStorageOrDefault("accessToken", "");
     if (
-      token != "" ||
-      (Object.keys(cookies).length != 0 && cookies.jid != "")
+      token != ""
+      // ||
+      // (Object.keys(cookies).length != 0 && cookies.jid != "")
     ) {
       fetchUser(token);
     }
@@ -76,7 +77,7 @@ export default function QuizHistory() {
       .then((response) => {
         userMutate({
           variables: {
-            username: response.data.username,
+            username: response.data.user.userName,
           },
         });
       });

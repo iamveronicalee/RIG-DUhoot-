@@ -11,7 +11,7 @@ import {
 } from "../Utils/useSessionStorage";
 import { socket } from "../Code/socket";
 import ErrorAlert from "../Component/ErrorAlert";
-import { useCookies } from "react-cookie";
+// import { useCookies } from "react-cookie";
 
 const GET_USER_BY_USERNAME = gql`
   mutation getUserByUsername($username: String!) {
@@ -37,7 +37,7 @@ export default function HomePage() {
 
   const navigate = useNavigate();
   const [quizId, setQuizId] = useState(0);
-  const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
+  // const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
 
   // const [quizId, setQuizId] = useState(0);
 
@@ -82,12 +82,19 @@ export default function HomePage() {
       .then((response) => {
         userMutate({
           variables: {
-            username: response.data.username,
+            username: response.data.user.userName,
           },
         });
       });
   };
-
+  useEffect(() => {
+    const token = getSessionStorageOrDefault("accessToken", "");
+    if (token == "") {
+      navigate("/auth/login");
+    } else {
+      fetchUser(token);
+    }
+  }, []);
   useEffect(() => {
     if (userMutateRes.data != undefined) {
       setUserId(userMutateRes.data.getUserByUsername.userName);
