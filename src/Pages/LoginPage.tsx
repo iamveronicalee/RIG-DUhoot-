@@ -27,28 +27,14 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [accessToken, setAccessToken] = useSessionStorage("accessToken", "");
   const [getLoginResponse, getLoginResponseRes] = useMutation(LOGIN_RESPONSE);
-  const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
+  // const [cookies, setCookie, removeCookie] = useCookies(["jid"]);
 
   useEffect(() => {
     const token = getSessionStorageOrDefault("accessToken", "");
-    if (
-      token != "" ||
-      (Object.keys(cookies).length != 0 && cookies.jid != "")
-    ) {
+    if (token != "") {
       navigate("/");
     }
   }, []);
-
-  useEffect(() => {
-    if (getLoginResponseRes.data) {
-      const token = getLoginResponseRes.data.login.accessToken;
-      setAccessToken(token);
-      setCookie("jid", token, {
-        path: "/",
-      });
-      navigate("/");
-    }
-  }, [getLoginResponseRes.data]);
 
   function loginResponse() {
     getLoginResponse({
@@ -57,6 +43,18 @@ export default function LoginPage() {
       },
     });
   }
+
+  
+  useEffect(() => {
+    if (getLoginResponseRes.data) {
+      const token = getLoginResponseRes.data.login.accessToken;
+      setAccessToken(token);
+      // setCookie("jid", token, {
+      //   path: "/",
+      // });
+      // navigate("/");
+    }
+  }, [getLoginResponseRes.data]);
 
   function fetchLecturer() {
     const lectData = {
@@ -102,7 +100,6 @@ export default function LoginPage() {
         console.log(error);
       });
   }
-  const [count, setCount] = useState(0);
 
   return (
     <div className="min-h-screen flex flex-col justify-center bg-blue-900 py-12 sm:px-6 lg:px-8">

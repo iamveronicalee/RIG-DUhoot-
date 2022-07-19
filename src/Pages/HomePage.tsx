@@ -49,8 +49,9 @@ export default function HomePage() {
 
   useEffect(() => {
     let count = getSessionStorageOrDefault("count", "");
+    // console.log(count)
     if (count == "") {
-      console.log("scoket connected");
+      console.log("socket connected");
       sessionStorage.setItem("count", "1");
       socket.on("join_room_feedback", (data) => {
         console.log(data);

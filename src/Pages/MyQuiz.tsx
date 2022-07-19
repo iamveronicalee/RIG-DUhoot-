@@ -121,7 +121,7 @@ export default function MyQuiz() {
         }
 
         let isFinished = userQuizRes.data.getPersonQuizList[i].isFinished;
-        let isStarted = userQuizRes.data.getPersonQuizList[i].isStart;
+        
         let nav = {
           name: quizName,
           href: "#",

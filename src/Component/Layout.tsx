@@ -99,18 +99,12 @@ export default function Layout(props, { children }) {
 
   useEffect(() => {
     const token = getSessionStorageOrDefault("accessToken", "");
-    if (
-      token == "" &&
-      (Object.keys(cookies).length == 0 ||
-        (Object.keys(cookies).length > 0 && cookies.jid == ""))
-    ) {
+    if (token == "") {
       navigate("/auth/login");
     } else {
       if (token != "") {
         fetchUser(token);
-      } else {
-        fetchUser(cookies.jid);
-      }
+      } 
     }
   }, []);
 
@@ -128,8 +122,7 @@ export default function Layout(props, { children }) {
         },
       })
       .then((response) => {
-        // console.log(response.data.realname)
-        setUsername(response.data.realname);
+        setUsername(response.data.userName);
         setUser(response.data.user.userName);
       });
   };
@@ -177,14 +170,14 @@ export default function Layout(props, { children }) {
       .then((response) => {
         if (response.status == 204) {
           setAccessToken("");
-          removeCookie("jid");
+          // removeCookie("jid");
           navigate("/auth/login");
         }
       })
       .catch((error) => {
         console.log(error);
         setAccessToken("");
-        removeCookie("jid");
+        // removeCookie("jid");
         navigate("/auth/login");
       });
   };
