@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import StellarBackground from "./StellarBackground";
+import StellarBackground from "../Component/StellarBackground";
 
 export default function AnswerQuiz() {
   const [option, setOption] = useState("");
@@ -9,7 +9,7 @@ export default function AnswerQuiz() {
       <div className="h-screen flex content-center justify-center overflow-hidden bg-indigo-900">
         <StellarBackground />
         <div className="flex flex-wrap content-center justify-center w-11/12 h-auto">
-          <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
+          <main className="flex-1 relative z-0 overflow-y-auto mostly-customized-scrollbar focus:outline-none">
             <div className="py-6 h-full overflow-hidden">
               <div className=" mx-auto px-4 sm:px-6 md:px-8">
                 <h1 className="inline-flex items-center justify-center px-2.5 py-0.5 content-center border border-transparent text-5xl font-medium rounded shadow-sm font-extrabold text-white italic bg-indigo-600 w-full h-full drop-shadow-md lg:text-5xl md:text-5xl text-2xl mt-8 ">
@@ -20,7 +20,7 @@ export default function AnswerQuiz() {
               </div>
               <div className="flex content-center mt-5 w-full h-full mx-auto px-4 sm:px-6 md:px-8 mt-2">
                 {/* Replace with your content */}
-                <div className="flex flex-col content-center sm:justify-center pt-2 overflow-y-scroll overflow-x-hidden rounded-lg shadow-xl bg-indigo-600 h-5/6 mt-4 w-full sm:pt-2 sm:pt-6">
+                <div className="flex flex-col content-center sm:justify-center pt-2 overflow-y-scroll mostly-customized-scrollbar overflow-x-hidden rounded-lg shadow-xl bg-indigo-600 h-5/6 mt-4 w-full sm:pt-2 sm:pt-6">
                   <div className="px-0 h-auto sm:px-0 flex align-center justify-center content-center">
                     <span className="inline-flex justify-center items-center content-center h-14 w-14 rounded-full rounded-full text-xl font-medium bg-gray-100 text-gray-800">
                       10

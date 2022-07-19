@@ -8,6 +8,24 @@ import {
   getSessionStorageOrDefault,
   useSessionStorage,
 } from "../Utils/useSessionStorage";
+import { gql } from "apollo-boost";
+import { useMutation } from "@apollo/react-hooks";
+
+const GET_QUIZ_DATA = gql`
+  mutation GetAllQuizDetailById($quizId: Float!) {
+    getAllQuizDetailById(quizId: $quizId) {
+      question {
+        id
+        questionDescription
+        optionConnection {
+          id
+          optionDescription
+          isAnswer
+        }
+      }
+    }
+  }
+`;
 
 const genrateRandomNumber = (min: number, max: number) => {
   min = Math.ceil(min);
@@ -17,10 +35,13 @@ const genrateRandomNumber = (min: number, max: number) => {
 
 export default function QuizParticipantPage() {
   // Data yang di pass
+  const [getQuizData, getQuizDataRes] = useMutation(GET_QUIZ_DATA);
   const { state } = useLocation();
   const location = state;
   const [quizName, setQuizName] = useState("");
   const [roomId, setRoomId] = useState("");
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [quizId, setQuizId] = useState("");
   const colors = ["red", "yellow", "green", "blue"];
   const [users, setUsers] = useState<any[]>([]);
   const navigate = useNavigate();
@@ -28,6 +49,20 @@ export default function QuizParticipantPage() {
     "participants",
     []
   );
+
+  const startQuiz = () => {
+    // data ->
+    // - roomId
+    // - hasEnded
+    // - question
+    console.log("STARTING QUIZ");
+    console.log(roomId);
+    console.log(quizId);
+    console.log(questions);
+    navigate("/host-quiz", {
+      state: { roomId: roomId, quizId: quizId, questions: questions },
+    });
+  };
 
   const hostExitRoom = (thisRoomId) => {
     socket.emit("close_room", {
@@ -38,11 +73,37 @@ export default function QuizParticipantPage() {
   };
 
   useEffect(() => {
+    if (getQuizDataRes.data) {
+      const quizDatas = getQuizDataRes.data.getAllQuizDetailById;
+      // masukin data kedalam array of quizData
+      var arr = [{}];
+      arr.pop();
+      quizDatas.map((item) => {
+        const i = item.question;
+        //nanti kita tinggal buat quizData baru append ke options
+        const quizData = {
+          questionId: i.id, // ambil dari mapping question id
+          question: i.questionDescription, // ambil dari mapping
+          answers: i.optionConnection, // ambil dari mapping
+        };
+        arr = [...arr, quizData];
+      });
+      setQuestions(arr);
+    }
+  }, [getQuizDataRes.data]);
+
+  useEffect(() => {
     if (location == null) {
       navigate("/");
     } else {
+      setQuizId(location.quizId);
       setQuizName(location.quizName);
       setRoomId(location.roomId);
+      getQuizData({
+        variables: {
+          quizId: location.quizId,
+        },
+      });
     }
   }, [location]);
 
@@ -132,7 +193,7 @@ export default function QuizParticipantPage() {
           <button
             type="button"
             className="inline-flex w-full sm:w-32 content-center justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            onClick={quizStarted()}
+            onClick={startQuiz}
           >
             Start
           </button>

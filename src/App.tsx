@@ -7,9 +7,10 @@ import LoginPage from "./Pages/LoginPage";
 import NewQuizPage from "./Pages/NewQuizPage";
 import MyQuiz from "./Pages/MyQuiz";
 import QuizHistory from "./Pages/QuizHistory";
-import JoinQuizPage from "./Pages/JoinQuizPage";
 import QuizParticipantPage from "./Pages/QuizParticipantPage";
 import WaitingHost from "./Component/WaitingHost";
+import QuizComponent from "./Component/QuizComponent";
+import HostQuizPage from "./Pages/HostQuizPage";
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
           path="/quiz-participants"
           element={<QuizParticipantPage />}
         ></Route>
-        <Route path="/quiz" element={<JoinQuizPage />}></Route>
+        <Route path="/host-quiz" element={<HostQuizPage />}></Route>
         <Route path="/create-quiz" element={<NewQuizPage />}></Route>
         <Route path="/" element={<HomePage />}></Route>
         <Route path="/my-quiz" element={<MyQuiz />}></Route>

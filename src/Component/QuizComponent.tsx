@@ -131,53 +131,11 @@ export default function QuizComponent({ quizId, quizName }) {
   const [answerC, setAnswerC] = useState("");
   const [answerD, setAnswerD] = useState("");
   const [selectedAnswer, setSelectedAnswer] = useState("");
-  //SOCKET
-
-  const generateRoomId = () => {
-    return Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
-  };
-
-  const createRoom = () => {
-    //generate RoomId
-    const ROOM_ID = generateRoomId();
-    socket.emit("create_room", {
-      roomId: ROOM_ID,
-      hostId: user,
-      isStarted: false,
-    });
-  };
-
-  useEffect(() => {
-    socket.on("create_room_feedback", (data) => {
-      if (data) {
-        let quizFinalName = getSessionStorageOrDefault("quizName", "");
-        //kalau room dah dibuat host bakal kemana
-        console.log("CREATE ROOM SUCCESS");
-        navigate("/quiz-participants", {
-          state: { quizName: quizFinalName, roomId: data.roomId },
-        });
-      } else {
-        //kalau gagal buat room.
-        console.log("CREATE ROOM ERROR");
-      }
-    });
-
-    socket.on("room_exist", (data) => {
-      if (data) {
-        console.log("ROOM ID USED...");
-        console.log("GENERATING NEW ROOM...");
-        createRoom();
-      }
-    });
-  }, [socket]);
-  //ENDSOCKET
 
   useEffect(() => {
     if (getQuizDataRes.data) {
       const quizDatas = getQuizDataRes.data.getAllQuizDetailById;
-      console.log(getQuizDataRes.data);
       // masukin data kedalam array of quizData
-      // setOptions([newOpt1]);
       var arr = [{}];
       arr.pop();
       quizDatas.map((item) => {
@@ -422,7 +380,50 @@ export default function QuizComponent({ quizId, quizName }) {
     setOptions([newOpt1]);
     reloadData();
   }, [quizId]);
+  //SOCKET
 
+  const generateRoomId = () => {
+    return Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+  };
+
+  const createRoom = () => {
+    //generate RoomId
+    const ROOM_ID = generateRoomId();
+    socket.emit("create_room", {
+      roomId: ROOM_ID,
+      hostId: user,
+      isStarted: false,
+    });
+  };
+
+  useEffect(() => {
+    socket.on("create_room_feedback", (data) => {
+      if (data) {
+        let quizFinalName = getSessionStorageOrDefault("quizName", "");
+        //kalau room dah dibuat host bakal kemana
+        console.log("CREATE ROOM SUCCESS");
+        navigate("/quiz-participants", {
+          state: {
+            quizName: quizFinalName,
+            roomId: data.roomId,
+            quizId: quizId,
+          },
+        });
+      } else {
+        //kalau gagal buat room.
+        console.log("CREATE ROOM ERROR");
+      }
+    });
+
+    socket.on("room_exist", (data) => {
+      if (data) {
+        console.log("ROOM ID USED...");
+        console.log("GENERATING NEW ROOM...");
+        createRoom();
+      }
+    });
+  }, [socket]);
+  //ENDSOCKET
   return (
     <div className="h-screen flex overflow-hidden bg-indigo-900">
       <Transition.Root show={sidebarOpen} as={Fragment}>
