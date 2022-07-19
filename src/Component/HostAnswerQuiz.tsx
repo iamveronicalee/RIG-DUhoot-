@@ -8,6 +8,20 @@ export default function HostAnswerQuiz({ question }) {
   const [answerC, setAnswerC] = useState("");
   const [answerD, setAnswerD] = useState("");
   const [questionDescription, setQuestionDescription] = useState("");
+
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    setSeconds(15);
+  }, []);
+
+  useEffect(() => {
+    seconds > 0 &&
+      setTimeout(() => {
+        setSeconds(seconds - 1);
+      }, 1000);
+  }, [seconds]);
+
   const isAnswer = (str) => {
     if (str != answer) {
       return "inline-block px-6 py-2.5 bg-gray-500 text-white font-medium text-xs leading-tight uppercase rounded transition duration-150 ease-in-out text-center block w-full h-24 sm:text-xl font-bold  border-gray-300 rounded-md resize-none";
@@ -48,20 +62,24 @@ export default function HostAnswerQuiz({ question }) {
                 <h1 className="inline-flex items-center text-center justify-center px-6 py-3 content-center border border-transparent text-5xl font-medium rounded shadow-sm font-extrabold text-white italic bg-indigo-600 w-full h-full drop-shadow-md lg:text-5xl md:text-5xl text-2xl">
                   The Answer Is {answer}
                 </h1>
-                <button
-                  type="button"
-                  className="inline-flex items-center px-6 py-3 border border-transparent text-xl font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ml-5"
-                >
-                  Next
-                </button>
+                {seconds == 0 ? (
+                  <button
+                    type="button"
+                    className="inline-flex items-center px-6 py-3 border border-transparent text-xl font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ml-5"
+                  >
+                    Next
+                  </button>
+                ) : null}
               </div>
               <div className="flex content-center mt-5 w-full h-full mx-auto px-4 sm:px-6 md:px-8 mt-2">
                 {/* Replace with your content */}
                 <div className="flex flex-col content-center sm:justify-center pt-2 overflow-y-scroll mostly-customized-scrollbar overflow-x-hidden rounded-lg shadow-xl bg-indigo-600 h-5/6 mt-4 w-full sm:pt-2 sm:pt-6">
                   <div className="px-0 h-auto sm:px-0 flex align-center justify-center content-center">
-                    <span className="inline-flex justify-center items-center content-center h-14 w-14 rounded-full rounded-full text-xl font-medium bg-gray-100 text-gray-800">
-                      10
-                    </span>
+                    {seconds != 0 ? (
+                      <span className="inline-flex justify-center items-center content-center h-14 w-14 rounded-full rounded-full text-xl font-medium bg-gray-100 text-gray-800">
+                        {seconds}
+                      </span>
+                    ) : null}
                   </div>
                   <div className="px-4 pb-6 sm:py-6 sm:px-6 h-2/5">
                     <div className="h-full">

@@ -11,6 +11,8 @@ export default function HostQuizPage() {
   const [questions, setQuestions] = useState<any[]>([]);
   const [quizId, setQuizId] = useState("");
   const [currentQuestion, setCurrentQuestion] = useState(0);
+
+
   const navigate = useNavigate();
 
   //dapetin data yang dipassing dari page quizParticipant.
